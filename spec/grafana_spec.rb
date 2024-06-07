@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 # require 'spec_helper'
-require 'rspec'
-require 'grafana'
+require "rspec"
+require "grafana"
 
 RSpec.configure do |config|
   config.mock_with :rspec
@@ -15,340 +15,332 @@ describe Grafana do
     config = {
       debug: false,
       grafana: {
-        host: ENV.fetch( 'GRAFANA_HOST', 'localhost' ),
-        port: ENV.fetch( 'GRAFANA_PORT', 3000 ).to_i
+        host: ENV.fetch( "GRAFANA_HOST", "localhost" ),
+        port: ENV.fetch( "GRAFANA_PORT", 3000 ).to_i
       }
     }
 
     @g  = Grafana::Client.new( config )
-    @g.login(username: 'admin', password: 'admin')
+    @g.login(username: "admin", password: "admin")
   end
 
+  describe "Frontend Settings" do
 
-  describe 'Frontend Settings' do
-
-    it 'settings' do
+    it "settings" do
       r = @g.settings
       expect(r).to be_a(Hash)
     end
   end
 
+  describe "get version" do
 
-  describe 'get version' do
-
-    it 'version' do
+    it "version" do
       r = @g.version
       expect(r).to be_a(Hash)
-      expect(r.dig(:version)).to be_a(String)
-      expect(r.dig(:major_version)).to be_a(Integer)
+      expect(r[:version]).to be_a(String)
+      expect(r[:major_version]).to be_a(Integer)
     end
   end
 
+  describe "Instance" do
 
-  describe 'Instance' do
-
-    it 'login' do
-      expect(@g.login(username: 'admin', password: 'admin')).to be_truthy
+    it "login" do
+      expect(@g.login(username: "admin", password: "admin")).to be_truthy
     end
   end
 
+  describe "Admin" do
 
-  describe 'Admin' do
-
-    it 'health' do
+    it "health" do
       r = @g.health
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
       expect(status).to be == 200
     end
 
-    it 'ping session' do
-      version, major_version = @g.version.values
+    it "ping session" do
+      _, major_version = @g.version.values
       r = @g.ping_session
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
 
       expect(status).to be_a(Integer)
       expect(status).to be == 200 if(major_version > 5)
       expect(status).to be == 401 if(major_version == 5)
     end
 
-    it 'admin settings' do
+    it "admin settings" do
       r = @g.admin_settings
 
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
       expect(status).to be == 200
     end
 
-    it 'admin stats' do
+    it "admin stats" do
       r = @g.admin_stats
 
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
       expect(status).to be == 200
     end
 
-    it 'add user \'spec-test-1\'' do
+    it "add user 'spec-test-1'" do
 
       r = @g.add_user(
-        user_name:'spec-test-1',
-        email: 'spec-test-1@bar.com',
-        password: 'pass'
+        user_name:"spec-test-1",
+        email: "spec-test-1@bar.com",
+        password: "pass"
       )
       expect(r).to be_a(Hash)
 
-      id = r.dig('id')
-      status = r.dig('status')
-      message = r.dig('message')
-      expect(r).to be_a(Hash)
-      expect(status).to be_a(Integer)
-      expect(id).to be_a(Integer)
-      expect(status).to be == 200
-    end
-
-    it 'add user \'spec-test-2\'' do
-
-      r = @g.add_user(
-        user_name:'spec-test-2',
-        email: 'spec-test-2@bar.com',
-        password: 'pass'
-      )
-      expect(r).to be_a(Hash)
-
-      id = r.dig('id')
-      status = r.dig('status')
-      message = r.dig('message')
+      id = r["id"]
+      status = r["status"]
+      r["message"]
       expect(r).to be_a(Hash)
       expect(status).to be_a(Integer)
       expect(id).to be_a(Integer)
       expect(status).to be == 200
     end
 
-    it 'add user \'spec-test-1\' (again)' do
+    it "add user 'spec-test-2'" do
 
       r = @g.add_user(
-        user_name:'spec-test-1',
-        email: 'spec-test-1@bar.com',
-        password: 'pass'
+        user_name:"spec-test-2",
+        email: "spec-test-2@bar.com",
+        password: "pass"
       )
       expect(r).to be_a(Hash)
 
-      id = r.dig('id')
-      status = r.dig('status')
-      message = r.dig('message')
+      id = r["id"]
+      status = r["status"]
+      r["message"]
+      expect(r).to be_a(Hash)
+      expect(status).to be_a(Integer)
+      expect(id).to be_a(Integer)
+      expect(status).to be == 200
+    end
+
+    it "add user 'spec-test-1' (again)" do
+
+      r = @g.add_user(
+        user_name:"spec-test-1",
+        email: "spec-test-1@bar.com",
+        password: "pass"
+      )
+      expect(r).to be_a(Hash)
+
+      id = r["id"]
+      status = r["status"]
+      r["message"]
       expect(r).to be_a(Hash)
       expect(status).to be_a(Integer)
       expect(id).to be_a(Integer)
       expect(status).to be == 404
     end
 
-    it 'delete admin user' do
+    it "delete admin user" do
       r = @g.delete_user(0)
       expect(r).to be_a(Hash)
-      status = r.dig('status')
+      status = r["status"]
       expect(status).to be_a(Integer)
       expect(status).to be == 403
     end
 
-    it 'set Password for User \'spec-test-1\'' do
+    it "set Password for User 'spec-test-1'" do
 
-      r = @g.update_user_password( user_name: 'spec-test-1', password: 'foor' )
+      r = @g.update_user_password( user_name: "spec-test-1", password: "foor" )
       expect(r).to be_a(Hash)
-      status = r.dig('status')
+      status = r["status"]
       expect(status).to be_a(Integer)
       expect(status).to be == 200
     end
 
-    it 'update user permissions (\'spec-test-1\')' do
+    it "update user permissions ('spec-test-1')" do
 
       params = {
-        user_name: 'spec-test-1@bar.com',
-        permissions: 'Viewer'
+        user_name: "spec-test-1@bar.com",
+        permissions: "Viewer"
       }
       r = @g.update_user_permissions( params )
 
       expect(r).to be_a(Hash)
-      status = r.dig('status')
+      status = r["status"]
       expect(status).to be_a(Integer)
       expect(status).to be == 200
     end
 
-    it 'update user permissions (\'spec-test-2\')' do
+    it "update user permissions ('spec-test-2')" do
 
       params = {
-        user_name: 'spec-test-2',
+        user_name: "spec-test-2",
         permissions: { grafana_admin: true }
       }
       r = @g.update_user_permissions( params )
 
       expect(r).to be_a(Hash)
-      status = r.dig('status')
+      status = r["status"]
       expect(status).to be_a(Integer)
       expect(status).to be == 200
     end
 
-    it 'delete user with id (\'spec-test-1\')' do
+    it "delete user with id ('spec-test-1')" do
 
-      usr = @g.user('spec-test-1@bar.com')
-      id = usr['id']
+      usr = @g.user("spec-test-1@bar.com")
+      id = usr["id"]
 
       r = @g.delete_user(id)
       expect(r).to be_a(Hash)
-      status = r.dig('status')
+      status = r["status"]
       expect(status).to be_a(Integer)
       expect(status).to be == 200
     end
 
-    it 'delete user with username (\'spec-test-2\')' do
-      r = @g.delete_user('spec-test-2@bar.com')
+    it "delete user with username ('spec-test-2')" do
+      r = @g.delete_user("spec-test-2@bar.com")
       expect(r).to be_a(Hash)
-      status = r.dig('status')
+      status = r["status"]
       expect(status).to be_a(Integer)
       expect(status).to be == 200
     end
 
-    it 'pause all alerts' do
+    it "pause all alerts" do
       r = @g.pause_all_alerts
 
       expect(r).to be_a(Hash)
-      status = r.dig('status')
+      status = r["status"]
       expect(status).to be_a(Integer)
       expect(status).to be == 200
     end
 
   end
 
+  describe "create demo data" do
 
-  describe 'create demo data' do
-
-    it 'Create \'graphite\' data source' do
+    it "Create 'graphite' data source" do
       r = @g.create_datasource(
-        name: 'graphite',
-        type: 'graphite',
+        name: "graphite",
+        type: "graphite",
 #         database: 'graphite',
-        url: 'http://localhost:8080'
+        url: "http://localhost:8080"
       )
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
       expect(status).to be == 200
     end
 
-    it 'import dashboards from directory' do
-      r = @g.import_dashboards_from_directory('spec/dashboards')
+    it "import dashboards from directory" do
+      r = @g.import_dashboards_from_directory("spec/dashboards")
       expect(r).to be_a(Hash)
       expect(r.count).to be == 2
-      expect(r.select { |k, v| v['status'] == 200 }.count).to be 2
+      expect(r.select { |_k, v| v["status"] == 200 }.count).to be 2
     end
 
   end
 
+  describe "Preferences" do
 
-  describe 'Preferences' do
-
-    it 'get current user preferences' do
-      version, major_version = @g.version.values
+    it "get current user preferences" do
+      _, major_version = @g.version.values
       r = @g.user_preferences
       expect(r).to be_a(Hash)
-      status = r.dig('status')
+      status = r["status"]
       expect(status).to be_a(Integer)
 
       expect(status).to be == 200 if(major_version >= 5)
       expect(status).to be == 404 if(major_version < 5)
     end
 
-    it 'update current user preferences' do
-      version, major_version = @g.version.values
+    it "update current user preferences" do
+      _, major_version = @g.version.values
 
       params = {
-        theme: 'dark',
-        timezone: 'browser',
-        home_dashboard: 'QA Graphite Carbon Metrics'
+        theme: "dark",
+        timezone: "browser",
+        home_dashboard: "QA Graphite Carbon Metrics"
       }
       r = @g.update_user_preferences(params)
       expect(r).to be_a(Hash)
-      status = r.dig('status')
+      status = r["status"]
       expect(status).to be_a(Integer)
 
       expect(status).to be == 200 if(major_version == 5)
       expect(status).to be == 404 if(major_version < 5)
     end
 
-    it 'update current user preferences (wrong theme, must be failed)' do
-      version, major_version = @g.version.values
+    it "update current user preferences (wrong theme, must be failed)" do
+      _, major_version = @g.version.values
 
       params = {
-        theme: 'darker'
+        theme: "darker"
       }
       r = @g.update_user_preferences(params)
       expect(r).to be_a(Hash)
-      status = r.dig('status')
+      status = r["status"]
       expect(status).to be_a(Integer)
 
       expect(status).to be == 404 if(major_version == 5)
       expect(status).to be == 404 if(major_version < 5)
     end
 
-
-    it 'update current user preferences (wrong timezone, must be failed)' do
-      version, major_version = @g.version.values
+    it "update current user preferences (wrong timezone, must be failed)" do
+      _, major_version = @g.version.values
 
       params = {
-        theme: 'dark',
-        timezone: 'europe/berlin'
+        theme: "dark",
+        timezone: "europe/berlin"
       }
       r = @g.update_user_preferences(params)
       expect(r).to be_a(Hash)
-      status = r.dig('status')
+      status = r["status"]
       expect(status).to be_a(Integer)
 
       expect(status).to be == 404 if(major_version == 5)
       expect(status).to be == 404 if(major_version < 5)
     end
 
-    it 'update current user preferences (wrong dashboard, must be failed)' do
-      version, major_version = @g.version.values
+    it "update current user preferences (wrong dashboard, must be failed)" do
+      _, major_version = @g.version.values
 
       params = {
-        theme: 'dark',
-        home_dashboard: 'non existing'
+        theme: "dark",
+        home_dashboard: "non existing"
       }
       r = @g.update_user_preferences(params)
       expect(r).to be_a(Hash)
-      status = r.dig('status')
+      status = r["status"]
       expect(status).to be_a(Integer)
 
       expect(status).to be == 404 if(major_version == 5)
       expect(status).to be == 404 if(major_version < 5)
     end
 
-
-    it 'get current organisation preferences' do
-      version, major_version = @g.version.values
+    it "get current organisation preferences" do
+      _, major_version = @g.version.values
       r = @g.org_preferences
       expect(r).to be_a(Hash)
-      status = r.dig('status')
+      status = r["status"]
       expect(status).to be_a(Integer)
 
       expect(status).to be == 200 if(major_version == 5)
       expect(status).to be == 404 if(major_version < 5)
     end
 
-    it 'update current organisation preferences' do
-      version, major_version = @g.version.values
+    it "update current organisation preferences" do
+      _, major_version = @g.version.values
 
       params = {
-        theme: 'dark',
-        timezone: 'browser',
-        home_dashboard: 'QA Graphite Carbon Metrics'
+        theme: "dark",
+        timezone: "browser",
+        home_dashboard: "QA Graphite Carbon Metrics"
       }
       r = @g.update_org_preferences(params)
       expect(r).to be_a(Hash)
-      status = r.dig('status')
+      status = r["status"]
       expect(status).to be_a(Integer)
 
       expect(status).to be == 200 if(major_version == 5)
@@ -356,7 +348,6 @@ describe Grafana do
     end
 
   end
-
 
   # Alerts are currently not functional (FOR ME!)
   # needs some Q&A with the grafana team
@@ -436,196 +427,195 @@ describe Grafana do
 #
 #  end
 
+  describe "Datasources" do
 
-  describe 'Datasources' do
-
-    it 'Create \'graphite-2\' data source' do
+    it "Create 'graphite-2' data source" do
       r = @g.create_datasource(
-        name: 'graphite-2',
-        type: 'graphite',
-        url: 'http://localhost:8080'
+        name: "graphite-2",
+        type: "graphite",
+        url: "http://localhost:8080"
       )
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
       expect(status).to be == 200
     end
 
-    it 'Create \'cloudwatch\' data source' do
+    it "Create 'cloudwatch' data source" do
       r = @g.create_datasource(
-        name: 'cloudwatch',
-        type: 'cloudwatch',
-        access: 'proxy',
-        url: 'http://localhost:8080'
+        name: "cloudwatch",
+        type: "cloudwatch",
+        access: "proxy",
+        url: "http://localhost:8080"
       )
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
       expect(status).to be == 200
     end
 
-    it 'Create \'elasticsearch\' data source' do
+    it "Create 'elasticsearch' data source" do
       r = @g.create_datasource(
-        name: 'elasticsearch',
-        type: 'elasticsearch',
-        access: 'proxy',
-        url: 'http://localhost:8080'
+        name: "elasticsearch",
+        type: "elasticsearch",
+        access: "proxy",
+        url: "http://localhost:8080"
       )
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
       expect(status).to be == 200
     end
 
-    it 'Create \'prometheus\' data source' do
+    it "Create 'prometheus' data source" do
       r = @g.create_datasource(
-        name: 'prometheus',
-        type: 'prometheus',
-        access: 'proxy',
-        url: 'http://localhost:8080'
+        name: "prometheus",
+        type: "prometheus",
+        access: "proxy",
+        url: "http://localhost:8080"
       )
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
       expect(status).to be == 200
     end
 
-    it 'Create \'influxdb\' data source' do
+    it "Create 'influxdb' data source" do
       r = @g.create_datasource(
-        name: 'influxdb',
-        type: 'influxdb',
-        access: 'proxy',
-        url: 'http://localhost:8080'
+        name: "influxdb",
+        type: "influxdb",
+        access: "proxy",
+        url: "http://localhost:8080"
       )
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
       expect(status).to be == 200
     end
 
-    it 'Create \'mysql\' data source' do
+    it "Create 'mysql' data source" do
       r = @g.create_datasource(
-        name: 'mysql',
-        type: 'mysql',
-        access: 'proxy',
-        url: 'http://localhost:8080'
+        name: "mysql",
+        type: "mysql",
+        access: "proxy",
+        url: "http://localhost:8080"
       )
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
       expect(status).to be == 200
     end
 
-    it 'Create \'opentsdb\' data source' do
+    it "Create 'opentsdb' data source" do
       r = @g.create_datasource(
-        name: 'opentsdb',
-        type: 'opentsdb',
-        access: 'proxy',
-        url: 'http://localhost:8080'
+        name: "opentsdb",
+        type: "opentsdb",
+        access: "proxy",
+        url: "http://localhost:8080"
       )
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
       expect(status).to be == 200
     end
 
-    it 'Create \'postgres\' data source' do
+    it "Create 'postgres' data source" do
       r = @g.create_datasource(
-        name: 'postgres',
-        type: 'postgres',
-        access: 'proxy',
-        url: 'http://localhost:8080'
+        name: "postgres",
+        type: "postgres",
+        access: "proxy",
+        url: "http://localhost:8080"
       )
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
       expect(status).to be == 200
     end
 
-    it 'Create \'grafana\' data source' do
+    it "Create 'grafana' data source" do
       r = @g.create_datasource(
-        name: 'grafana',
-        type: 'grafana',
-        access: 'proxy',
-        url: 'http://localhost:8080'
+        name: "grafana",
+        type: "grafana",
+        access: "proxy",
+        url: "http://localhost:8080"
       )
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
       expect(status).to be == 200
     end
 
-    it 'Update an existing data source \'graphite-2\'' do
+    it "Update an existing data source 'graphite-2'" do
       r = @g.update_datasource(
-        name: 'graphite-2',
+        name: "graphite-2",
         organisation: 1,
-        url: 'http://localhost:2003'
+        url: "http://localhost:2003"
       )
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
       expect(status).to be == 200
     end
 
-    it 'Get all datasources' do
+    it "Get all datasources" do
       r = @g.datasources
       expect(r).to be_a(Hash)
       expect(r.keys.count).to be >= 9
     end
 
-    it 'Get a single data sources by Name' do
-      r = @g.datasource('graphite')
+    it "Get a single data sources by Name" do
+      r = @g.datasource("graphite")
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
       expect(status).to be == 200
     end
 
-    it 'Get a single data sources by Id' do
+    it "Get a single data sources by Id" do
       r = @g.datasources
       id = r.keys.first
       r = @g.datasource(id)
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
       expect(status).to be == 200
     end
 
-    it 'Create data source \'foo-2\'' do
+    it "Create data source 'foo-2'" do
       r = @g.create_datasource(
-        name: 'foo-2',
-        type: 'graphite',
-        database: 'foo-2',
-        access: 'proxy',
-        url: 'http://localhost:8080'
+        name: "foo-2",
+        type: "graphite",
+        database: "foo-2",
+        access: "proxy",
+        url: "http://localhost:8080"
       )
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
       expect(status).to be == 200
     end
 
-    it 'Update an existing data source \'foo-2\'' do
+    it "Update an existing data source 'foo-2'" do
       r = @g.update_datasource(
-        name: 'foo-2',
-        type: 'influxdb',
-        url: 'http://localhost:2003'
+        name: "foo-2",
+        type: "influxdb",
+        url: "http://localhost:2003"
       )
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
       expect(status).to be == 200
     end
 
-    it 'Delete an existing data source \'foo-2\' (by name)' do
-      r = @g.delete_datasource('foo-2')
+    it "Delete an existing data source 'foo-2' (by name)" do
+      r = @g.delete_datasource("foo-2")
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
       expect(status).to be == 200
     end
 
-    it 'delete all created datasources' do
+    it "delete all created datasources" do
 
       %w[grafana graphite-2 cloudwatch elasticsearch prometheus influxdb mysql opentsdb postgres].each do |d|
         r = @g.delete_datasource(d)
@@ -635,111 +625,107 @@ describe Grafana do
 
   end
 
+  describe "Organisation" do
 
-  describe 'Organisation' do
-
-    it 'Get current Organisation' do
+    it "Get current Organisation" do
       r = @g.current_organization
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
       expect(status).to be == 200
     end
 
-    it 'Get all Organisations' do
+    it "Get all Organisations" do
       r = @g.organizations
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
       expect(status).to be == 200
     end
 
-    it 'Get Organisation by Id' do
+    it "Get Organisation by Id" do
       r = @g.organization(1)
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
       expect(status).to be == 200
     end
 
-    it 'Get Organisation \'Main Org.\' by Name' do
-      r = @g.organization('Main Org.')
+    it "Get Organisation 'Main Org.' by Name" do
+      r = @g.organization("Main Org.")
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
       expect(status).to be == 200
     end
 
-    it 'Get all users within the actual organisation' do
+    it "Get all users within the actual organisation" do
       r = @g.current_organization_users
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
       expect(status).to be == 200
     end
 
-    it 'Update current Organisation' do
-      r = @g.update_current_organization( name: 'foo')
+    it "Update current Organisation" do
+      r = @g.update_current_organization( name: "foo")
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
       expect(status).to be == 200
     end
 
-
-    it 'Restore current Organisation' do
-      r = @g.update_current_organization( name: 'Main Org.')
+    it "Restore current Organisation" do
+      r = @g.update_current_organization( name: "Main Org.")
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
       expect(status).to be == 200
     end
 
-
-    it 'Add a new user to the actual organisation' do
+    it "Add a new user to the actual organisation" do
       r = @g.add_user_to_current_organization(
-        role: 'Viewer',
-        login_or_email: 'spec-test@bar.com'
+        role: "Viewer",
+        login_or_email: "spec-test@bar.com"
       )
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
     end
 
   end
 
+  describe "Organisations" do
 
-  describe 'Organisations' do
-
-    it 'Create Organisation \'Spec Test\'' do
-      r = @g.create_organisation( name: 'Spec Test' )
+    it "Create Organisation 'Spec Test'" do
+      r = @g.create_organisation( name: "Spec Test" )
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
-      org_id  = r.dig('orgId')
+      status  = r["status"]
+      org_id  = r["orgId"]
       expect(status).to be_a(Integer)
       expect(status).to be == 200
       expect(org_id).to be_a(Integer)
     end
 
-    it 'Search all Organisations' do
+    it "Search all Organisations" do
       r = @g.organizations
 
       expect(r).to be_a(Hash)
 
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
       expect(status).to be == 200
     end
 
-    it 'Get Organisation by Id' do
+    it "Get Organisation by Id" do
 
       r = @g.organization( 1 )
 
       expect(r).to be_a(Hash)
 
-      status  = r.dig('status')
-      id      = r.dig('id')
-      name    = r.dig('name')
+      status  = r["status"]
+      id      = r["id"]
+      name    = r["name"]
 
       expect(status).to be_a(Integer)
       expect(status).to be == 200
@@ -747,234 +733,229 @@ describe Grafana do
       expect(name).to be_a(String)
     end
 
-    it 'Get Organisation \'Spec Test\' by Name' do
-      r = @g.organization( 'Spec Test' )
+    it "Get Organisation 'Spec Test' by Name" do
+      r = @g.organization( "Spec Test" )
 
       expect(r).to be_a(Hash)
 
-      status  = r.dig('status')
-      id      = r.dig('id')
-      name    = r.dig('name')
+      status  = r["status"]
+      id      = r["id"]
+      name    = r["name"]
 
       expect(status).to be_a(Integer)
       expect(status).to be == 200
       expect(id).to be_a(Integer)
       expect(name).to be_a(String)
-      expect(name).to be == 'Spec Test'
+      expect(name).to be == "Spec Test"
 
     end
 
-    it 'Update Organisation' do
+    it "Update Organisation" do
 
-      org = @g.organization('Spec Test')
-      id   = org.dig('id')
-      name = org.dig('name')
+      org = @g.organization("Spec Test")
+      org["id"]
+      org["name"]
 
-      r = @g.update_organization( organization: 'Spec Test', name: 'Spec+Test' )
+      r = @g.update_organization( organization: "Spec Test", name: "Spec+Test" )
       expect(r).to be_a(Hash)
 
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
       expect(status).to be == 200
 
-      r = @g.update_organization( organization: 'Spec+Test', name: 'Spec Test' )
+      @g.update_organization( organization: "Spec+Test", name: "Spec Test" )
     end
 
-    it 'Get Users in Organisation with Organisation Name' do
-      r = @g.organization_users('Spec Test')
+    it "Get Users in Organisation with Organisation Name" do
+      r = @g.organization_users("Spec Test")
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
       expect(status).to be == 200
-      message = r.dig('message')
+      message = r["message"]
       expect(message).to be_a(Array)
       expect(message.size).to be >= 1
     end
 
-    it 'Get Users in Organisation with Organisation Id' do
+    it "Get Users in Organisation with Organisation Id" do
 
-      org = @g.organization('Spec Test')
-      id   = org.dig('id')
-      name = org.dig('name')
+      org = @g.organization("Spec Test")
+      id   = org["id"]
+      org["name"]
 
       r = @g.organization_users(id)
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
       expect(status).to be == 200
-      message = r.dig('message')
+      message = r["message"]
       expect(message).to be_a(Array)
       expect(message.size).to be >= 1
     end
 
-    it 'Add temporary User for Organisation' do
+    it "Add temporary User for Organisation" do
       r = @g.add_user(
-        user_name:'foo',
-        email: 'foo@foo-bar.tld',
-        password: 'pass'
+        user_name:"foo",
+        email: "foo@foo-bar.tld",
+        password: "pass"
       )
       expect(r).to be_a(Hash)
 
-      status = r.dig('status')
-      id = r.dig('id')
-      message = r.dig('message')
+      status = r["status"]
+      id = r["id"]
+      r["message"]
       expect(r).to be_a(Hash)
       expect(status).to be_a(Integer)
       expect(id).to be_a(Integer)
     end
 
-    it 'Add User in Organisation - successful' do
+    it "Add User in Organisation - successful" do
       params = {
-        organization: 'Spec Test',
-        login_or_email: 'foo@foo-bar.tld',
-        role: 'Editor'
+        organization: "Spec Test",
+        login_or_email: "foo@foo-bar.tld",
+        role: "Editor"
       }
       r = @g.add_user_to_organization( params )
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
 
-      if(status != 200)
-        puts r
-      end
+      puts r if status != 200
 
       expect(status).to be == 200
     end
 
-    it 'Add User in Organisation - failed' do
+    it "Add User in Organisation - failed" do
       params = {
-        organization: 'Spec Test',
-        login_or_email: 'foo-2@foo-bar.tld',
-        role: 'Foo'
+        organization: "Spec Test",
+        login_or_email: "foo-2@foo-bar.tld",
+        role: "Foo"
       }
       r = @g.add_user_to_organization( params )
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be == 404
     end
 
-    it 'Update Users in Organisation - successful' do
+    it "Update Users in Organisation - successful" do
       params = {
-        organization: 'Spec Test',
-        login_or_email: 'foo@foo-bar.tld',
-        role: 'Viewer'
+        organization: "Spec Test",
+        login_or_email: "foo@foo-bar.tld",
+        role: "Viewer"
       }
       r = @g.update_organization_user( params )
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be == 200
     end
 
-    it 'Update Users in Organisation - failed' do
+    it "Update Users in Organisation - failed" do
       params = {
-        organization: 'Spec Test',
-        login_or_email: 'foo-2@foo-bar.tld',
-        role: 'Bar'
+        organization: "Spec Test",
+        login_or_email: "foo-2@foo-bar.tld",
+        role: "Bar"
       }
       r = @g.update_organization_user( params )
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be == 404
     end
 
-    it 'Delete User in Organisation' do
-      r = @g.delete_user_from_organization( organization: 'Spec Test', login_or_email: 'foo@foo-bar.tld' )
+    it "Delete User in Organisation" do
+      r = @g.delete_user_from_organization( organization: "Spec Test", login_or_email: "foo@foo-bar.tld" )
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be == 200
     end
 
-    it 'Delete Organisation' do
-      r = @g.delete_organisation( 'Spec Test' )
+    it "Delete Organisation" do
+      r = @g.delete_organisation( "Spec Test" )
       expect(r).to be_a(Hash)
-      status = r.dig('status')
-      message = r.dig('message')
+      status = r["status"]
+      message = r["message"]
       expect(status).to be_a(Integer)
       expect(status).to be == 200
       expect(message).to be_a(String)
     end
 
-    it 'delete temporary User for Organisation' do
-      r = @g.delete_user('foo@foo-bar.tld')
+    it "delete temporary User for Organisation" do
+      r = @g.delete_user("foo@foo-bar.tld")
       expect(r).to be_a(Hash)
-      status = r.dig('status')
+      status = r["status"]
       expect(status).to be_a(Integer)
       expect(status).to be == 200
     end
 
   end
 
+  describe "User" do
 
-  describe 'User' do
-
-    it 'Actual User' do
+    it "Actual User" do
       r = @g.current_user
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
 
       expect(status).to be_a(Integer)
       expect(status).to be == 200
     end
 
-    it 'Organisations of the actual User' do
+    it "Organisations of the actual User" do
       r = @g.current_user_oganizations
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
 
       expect(status).to be_a(Integer)
       expect(status).to be == 200
     end
 
-    it 'import dashboards from directory' do
-      r = @g.import_dashboards_from_directory('spec/dashboards')
+    it "import dashboards from directory" do
+      r = @g.import_dashboards_from_directory("spec/dashboards")
       expect(r).to be_a(Hash)
     end
 
-    it 'Star a dashboard' do
-      r = @g.add_dashboard_star( 'QA Graphite Carbon Metrics' )
+    it "Star a dashboard" do
+      r = @g.add_dashboard_star( "QA Graphite Carbon Metrics" )
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
 
       expect(status).to be_a(Integer)
       expect(status).to be == 200
     end
 
-    it 'Unstar a dashboard' do
-      r = @g.remove_dashboard_star( 'QA Graphite Carbon Metrics' )
+    it "Unstar a dashboard" do
+      r = @g.remove_dashboard_star( "QA Graphite Carbon Metrics" )
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
 
       expect(status).to be_a(Integer)
       expect(status).to be == 200
     end
 
-
-    it 'delete dashboard' do
-      search = { :tags => 'QA' }
+    it "delete dashboard" do
+      search = { tags: "QA" }
       r = @g.search_dashboards( search )
       expect(r).to be_a(Hash)
-      message = r.dig('message')
+      message = r["message"]
       expect(message).to be_a(Array)
       expect(message.count).equal?(2)
 
       message.each do |m|
-        title = m.dig('title')
+        title = m["title"]
         r = @g.delete_dashboard(title)
         expect(r).to be_a(Hash)
-        status  = r.dig('status')
+        status  = r["status"]
         expect(status).to be == 200
       end
 
     end
   end
 
+  describe "Users" do
 
-  describe 'Users' do
-
-    it 'get all Users' do
+    it "get all Users" do
       r = @g.users
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
-      message = r.dig('message')
+      status  = r["status"]
+      message = r["message"]
 
       expect(status).to be_a(Integer)
       expect(status).to be == 200
@@ -982,103 +963,103 @@ describe Grafana do
       expect(message.count).to be >= 1
     end
 
-    it 'add temporary User' do
+    it "add temporary User" do
       r = @g.add_user(
-        user_name:'foo',
-        email: 'foo@foo-bar.tld',
-        password: 'pass'
+        user_name:"foo",
+        email: "foo@foo-bar.tld",
+        password: "pass"
       )
       expect(r).to be_a(Hash)
 
-      status = r.dig('status')
-      id = r.dig('id')
-      message = r.dig('message')
+      status = r["status"]
+      id = r["id"]
+      r["message"]
       expect(r).to be_a(Hash)
       expect(status).to be_a(Integer)
       expect(id).to be_a(Integer)
     end
 
-    it 'get users by Id (1) - must be successful' do
+    it "get users by Id (1) - must be successful" do
       r = @g.user(1)
 
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
-      message = r.dig('message')
+      status  = r["status"]
+      r["message"]
 
       expect(status).to be_a(Integer)
       expect(status).to be == 200
     end
 
-    it 'get users by Id (2) - must be failed' do
+    it "get users by Id (2) - must be failed" do
       r = @g.user(2)
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
-      message = r.dig('message')
+      status  = r["status"]
+      r["message"]
 
       expect(status).to be_a(Integer)
       expect(status).to be == 404
     end
 
-    it 'get users by Name - must be successful' do
-      r = @g.user( 'admin@localhost' )
+    it "get users by Name - must be successful" do
+      r = @g.user( "admin@localhost" )
       expect(r).to be_a(Hash)
 
-      status  = r.dig('status')
-      message = r.dig('message')
+      status  = r["status"]
+      r["message"]
 
       expect(status).to be_a(Integer)
       expect(status).to be == 200
     end
 
-    it 'add another temporary User' do
+    it "add another temporary User" do
       r = @g.add_user(
-        user_name:'foo-2',
-        email: 'foo-2@foo-bar.tld',
-        password: 'pass'
+        user_name:"foo-2",
+        email: "foo-2@foo-bar.tld",
+        password: "pass"
       )
       expect(r).to be_a(Hash)
 
-      status = r.dig('status')
-      id = r.dig('id')
-      message = r.dig('message')
+      status = r["status"]
+      id = r["id"]
+      r["message"]
       expect(r).to be_a(Hash)
       expect(status).to be_a(Integer)
       expect(id).to be_a(Integer)
     end
 
-    it 'search for Users by (admin == true)' do
+    it "search for Users by (admin == true)" do
       r = @g.search_for_users_by( isAdmin: true )
       expect(r).to be_a(Array)
     end
 
-    it 'Search for Users by (login == foo)' do
-      r = @g.search_for_users_by( login: 'foo' )
+    it "Search for Users by (login == foo)" do
+      r = @g.search_for_users_by( login: "foo" )
       expect(r).to be_a(Array)
     end
 
-    it 'Get Organisations for user' do
+    it "Get Organisations for user" do
 
-      r = @g.user_organizations('foo@foo-bar.tld')
+      r = @g.user_organizations("foo@foo-bar.tld")
 
       expect(r).to be_a(Hash)
 
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
       expect(status).to be == 200
     end
 
-    it 'Update Users' do
+    it "Update Users" do
 
       r = @g.update_user(
-        user_name: 'foo-2',
-        theme: 'light',
-        login_name: 'spec-test',
-        email: 'spec-test@foo-bar.tld'
+        user_name: "foo-2",
+        theme: "light",
+        login_name: "spec-test",
+        email: "spec-test@foo-bar.tld"
       )
       expect(r).to be_a(Hash)
 
-      status  = r.dig('status')
-      message = r.dig('message')
+      status  = r["status"]
+      message = r["message"]
       expect(status).to be_a(Integer)
       expect(status).to be == 200
       expect(message).to be_a(String)
@@ -1100,62 +1081,60 @@ describe Grafana do
 #       expect(status).to be == 200
 #     end
 
-
   end
 
+  describe "Teams" do
 
-  describe 'Teams' do
-
-    it 'add team \'team alpha\'' do
-      r = @g.add_team(name: 'team alpha')
+    it "add team 'team alpha'" do
+      r = @g.add_team(name: "team alpha")
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be == 200
     end
 
-    it 'add team \'team alpha\' (again)' do
-      r = @g.add_team(name: 'team alpha')
+    it "add team 'team alpha' (again)" do
+      r = @g.add_team(name: "team alpha")
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be == 404
     end
 
-    it 'search team \'team alpha\'' do
-      r = @g.search_team(name: 'team alpha')
+    it "search team 'team alpha'" do
+      r = @g.search_team(name: "team alpha")
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
-      teams   = r.dig('teams')
+      status  = r["status"]
+      teams   = r["teams"]
       expect(status).to be == 200
       expect(teams).to be_a(Array)
     end
 
-    it 'search team \'team beta\'' do
-      r = @g.search_team(name: 'team beta')
+    it "search team 'team beta'" do
+      r = @g.search_team(name: "team beta")
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
-      teams   = r.dig('teams')
+      status  = r["status"]
+      teams   = r["teams"]
       expect(status).to be == 404
       expect(teams).to be_a(Array)
     end
 
-    it 'get team \'team alpha\'' do
-      r = @g.team('team alpha')
+    it "get team 'team alpha'" do
+      r = @g.team("team alpha")
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be == 200
     end
 
-    it 'get team \'team beta\'' do
-      r = @g.team('team beta')
+    it "get team 'team beta'" do
+      r = @g.team("team beta")
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be == 404
     end
 
-    it 'update team \'team alpha\'' do
-      r = @g.update_team(team_id: 'team alpha', email: 'foo@bar.com')
+    it "update team 'team alpha'" do
+      r = @g.update_team(team_id: "team alpha", email: "foo@bar.com")
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be == 200
     end
 
@@ -1170,151 +1149,150 @@ describe Grafana do
 #       expect(message.count).to be >= 1
 #     end
 
-    it 'add team members for team \'team alpha\'' do
-      r = @g.add_team_member(team_id:'team alpha', user_id: 'foo')
+    it "add team members for team 'team alpha'" do
+      r = @g.add_team_member(team_id:"team alpha", user_id: "foo")
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be == 200
     end
 
-    it 'add team members for team \'team alpha\' (must be fail)' do
-      r = @g.add_team_member(team_id:'team alpha', user_id: 'foo-3')
+    it "add team members for team 'team alpha' (must be fail)" do
+      r = @g.add_team_member(team_id:"team alpha", user_id: "foo-3")
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be == 404
     end
 
-    it 'team members for team \'team alpha\'' do
-      r = @g.team_members('team alpha')
+    it "team members for team 'team alpha'" do
+      r = @g.team_members("team alpha")
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be == 200
     end
 
-    it 'team members for team \'team beta\'' do
-      r = @g.team_members('team beta')
+    it "team members for team 'team beta'" do
+      r = @g.team_members("team beta")
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be == 404
     end
 
-    it 'remove team member from team \'team alpha\'' do
-      r = @g.remove_team_member(team_id:'team alpha', user_id: 'foo')
+    it "remove team member from team 'team alpha'" do
+      r = @g.remove_team_member(team_id:"team alpha", user_id: "foo")
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be == 200
     end
 
-    it 'remove team member from team \'team alpha\' again (must be failed)' do
-      r = @g.remove_team_member(team_id:'team alpha', user_id: 'foo')
+    it "remove team member from team 'team alpha' again (must be failed)" do
+      r = @g.remove_team_member(team_id:"team alpha", user_id: "foo")
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be == 404
     end
 
-    it 'delete team \'team alpha\'' do
-      r = @g.delete_team('team alpha')
+    it "delete team 'team alpha'" do
+      r = @g.delete_team("team alpha")
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be == 200
     end
   end
 
+  describe "Dashboards" do
 
-  describe 'Dashboards' do
-
-    it 'import dashboards from directory' do
-      r = @g.import_dashboards_from_directory('spec/dashboards')
+    it "import dashboards from directory" do
+      r = @g.import_dashboards_from_directory("spec/dashboards")
       expect(r).to be_a(Hash)
       expect(r.count).to be == 2
-      expect(r.select { |k, v| v['status'] == 200 }.count).to eq(2)
+      expect(r.select { |_k, v| v["status"] == 200 }.count).to eq(2)
     end
 
-    it 'dashboards tags' do
+    it "dashboards tags" do
       r = @g.dashboard_tags
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be == 200
     end
 
-    it 'home dashboard' do
+    it "home dashboard" do
       r = @g.home_dashboard
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be == 200
     end
 
-    it 'search tagged dashboards' do
-      search = { tags: 'QA' }
+    it "search tagged dashboards" do
+      search = { tags: "QA" }
       r = @g.search_dashboards( search )
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be == 200
-      message = r.dig('message')
+      message = r["message"]
       expect(message).to be_a(Array)
       expect(message.count).equal?(2)
     end
 
-    it 'search starred dashboards' do
+    it "search starred dashboards" do
       search = { starred: true }
       r = @g.search_dashboards( search )
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be == 200
-      message = r.dig('message')
+      message = r["message"]
       expect(message).to be_a(Array)
       expect(message.count).to be == 0
     end
 
-    it 'search dashboards with query' do
-      search = { query: 'QA Graphite Carbon Metrics' }
+    it "search dashboards with query" do
+      search = { query: "QA Graphite Carbon Metrics" }
       r = @g.search_dashboards( search )
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be == 200
-      message = r.dig('message')
+      message = r["message"]
       expect(message).to be_a(Array)
       expect(message.count).to be == 1
     end
 
-    it 'list dashboard (Grafana v4.x and Grafana v5.x)' do
-      search = { query: 'QA Graphite Carbon Metrics' }
+    it "list dashboard (Grafana v4.x and Grafana v5.x)" do
+      search = { query: "QA Graphite Carbon Metrics" }
       r = @g.search_dashboards( search )
-      message = r.dig('message')
-      title = message.first.dig('title')
+      message = r["message"]
+      title = message.first["title"]
       r = @g.dashboard(title)
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be == 200
-      t = r.dig('dashboard','title')
+      t = r.dig("dashboard","title")
       expect(t).to be_a(String)
       expect(t).equal?(title)
     end
 
-    it 'list dashboard by uid (only Grafana v5.x)' do
-      search = { query: 'QA Graphite Carbon Metrics' }
+    it "list dashboard by uid (only Grafana v5.x)" do
+      search = { query: "QA Graphite Carbon Metrics" }
       r = @g.search_dashboards( search )
-      message = r.dig('message')
-      uid = message.first.dig('uid')
-      title = message.first.dig('title')
+      message = r["message"]
+      uid = message.first["uid"]
+      title = message.first["title"]
       # dashboard-by-uid
       r = @g.dashboard_by_uid(uid)
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be == 200
-      t = r.dig('dashboard','title')
+      t = r.dig("dashboard","title")
       expect(t).to be_a(String)
       expect(t).equal?(title)
     end
 
-    it 'list dashboard by uid (only Grafana v5.x. uid to long. must be fail)' do
-      r = @g.dashboard_by_uid('3d188cab-ffdf-47f1-b656-edde5cdfd31b-xxxx')
+    it "list dashboard by uid (only Grafana v5.x. uid to long. must be fail)" do
+      r = @g.dashboard_by_uid("3d188cab-ffdf-47f1-b656-edde5cdfd31b-xxxx")
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be == 404
     end
 
-    it 'create dashboard' do
+    it "create dashboard" do
       a = '{
         "dashboard": {
           "id": null,
@@ -1328,11 +1306,11 @@ describe Grafana do
       }'
       r = @g.create_dashboard(dashboard: JSON.parse(a) )
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be == 200
     end
 
-    it 'create dashboard (uid to long. must be fail)' do
+    it "create dashboard (uid to long. must be fail)" do
       a = '{
         "dashboard": {
           "id": null,
@@ -1346,24 +1324,23 @@ describe Grafana do
       }'
       r = @g.create_dashboard(dashboard: JSON.parse(a) )
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be == 404
     end
 
-
-    it 'delete dashboard' do
-      search = { tags: 'QA' }
+    it "delete dashboard" do
+      search = { tags: "QA" }
       r = @g.search_dashboards( search )
       expect(r).to be_a(Hash)
-      message = r.dig('message')
+      message = r["message"]
       expect(message).to be_a(Array)
       expect(message.count).equal?(2)
 
       message.each do |m|
-        title = m.dig('title')
+        title = m["title"]
         r = @g.delete_dashboard(title)
         expect(r).to be_a(Hash)
-        status  = r.dig('status')
+        status  = r["status"]
         expect(status).to be == 200
       end
 
@@ -1371,302 +1348,285 @@ describe Grafana do
 
   end
 
+  describe "Dashboard Permissions" do
 
-  describe 'Dashboard Permissions' do
-
-    it 'import dashboards from directory' do
-      r = @g.import_dashboards_from_directory('spec/dashboards')
+    it "import dashboards from directory" do
+      r = @g.import_dashboards_from_directory("spec/dashboards")
       expect(r).to be_a(Hash)
       expect(r.count).to be == 2
-      expect(r.select { |k, v| v['status'] == 200 }.count).to be 2
+      expect(r.select { |_k, v| v["status"] == 200 }.count).to be 2
     end
 
-    it 'Gets all existing permissions for a existing dashboard' do
-      search = { query: 'QA Graphite Carbon Metrics' }
+    it "Gets all existing permissions for a existing dashboard" do
+      search = { query: "QA Graphite Carbon Metrics" }
       r = @g.search_dashboards( search )
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be == 200
-      message = r.dig('message')
+      message = r["message"]
       expect(message).to be_a(Array)
-      id = message.first.dig('id')
+      id = message.first["id"]
       r = @g.dashboard_permissions(id)
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be == 200
     end
 
-    it 'Gets all existing permissions for a non existing dashboard ' do
-      search = { query: 'QA Graphite Carbon Metrics' }
+    it "Gets all existing permissions for a non existing dashboard " do
       r = @g.dashboard_permissions(1)
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be == 404
     end
 
-
-    it 'update permissions for an existing dashboard ' do
-      search = { query: 'QA Graphite Carbon Metrics' }
+    it "update permissions for an existing dashboard " do
+      search = { query: "QA Graphite Carbon Metrics" }
       r = @g.search_dashboards( search )
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be == 200
-      message = r.dig('message')
+      message = r["message"]
       expect(message).to be_a(Array)
-      id = message.first.dig('id')
+      id = message.first["id"]
 
       params = {
         dashboard_id: id,
         permissions: {
           team: [
-            { 'team beta' => 'View' },
-            { 'team alpha' => 'Viewer' },
-            { 'team beta' => 'Editor' },
-            { 'team alpha' => 'Edit' }
+            { "team beta" => "View" },
+            { "team alpha" => "Viewer" },
+            { "team beta" => "Editor" },
+            { "team alpha" => "Edit" }
           ],
           user: [
-            { 'qa' => 'Admin' },
-            { 'foo' => 'View' }
+            { "qa" => "Admin" },
+            { "foo" => "View" }
           ]
         }
       }
       r = @g.update_dashboad_permissions( params )
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
       expect(status).to be == 200
     end
 
-
-    it 'delete dashboard' do
-      search = { tags: 'QA' }
+    it "delete dashboard" do
+      search = { tags: "QA" }
       r = @g.search_dashboards( search )
       expect(r).to be_a(Hash)
-      message = r.dig('message')
+      message = r["message"]
       expect(message).to be_a(Array)
       expect(message.count).equal?(2)
 
       message.each do |m|
-        title = m.dig('title')
+        title = m["title"]
         r = @g.delete_dashboard(title)
         expect(r).to be_a(Hash)
-        status  = r.dig('status')
+        status  = r["status"]
         expect(status).to be == 200
       end
 
     end
 
-
   end
 
+  describe "Dashboard Versions" do
 
-  describe 'Dashboard Versions' do
-
-    it 'import dashboards from directory' do
-      r = @g.import_dashboards_from_directory('spec/dashboards')
+    it "import dashboards from directory" do
+      r = @g.import_dashboards_from_directory("spec/dashboards")
       expect(r).to be_a(Hash)
       expect(r.count).to be == 2
-      expect(r.select { |k, v| v['status'] == 200 }.count).to be 2
+      expect(r.select { |_k, v| v["status"] == 200 }.count).to be 2
     end
 
-
-    it 'get all dashboard versions' do
-      search = { query: 'QA Graphite Carbon Metrics' }
+    it "get all dashboard versions" do
+      search = { query: "QA Graphite Carbon Metrics" }
       r = @g.search_dashboards( search )
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be == 200
-      message = r.dig('message')
+      message = r["message"]
       expect(message).to be_a(Array)
-      id = message.first.dig('id')
+      id = message.first["id"]
 
       r = @g.dashboard_all_versions(dashboard_id: id)
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be == 200
     end
 
-    it 'get all dashboard versions of dashboard \'999\' (must be fail)' do
+    it "get all dashboard versions of dashboard '999' (must be fail)" do
       r = @g.dashboard_all_versions(dashboard_id: 999)
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be == 404
     end
 
-    it 'get version 1 of dashboard' do
-      search = { query: 'QA Graphite Carbon Metrics' }
+    it "get version 1 of dashboard" do
+      search = { query: "QA Graphite Carbon Metrics" }
       r = @g.search_dashboards( search )
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be == 200
-      message = r.dig('message')
+      message = r["message"]
       expect(message).to be_a(Array)
-      id = message.first.dig('id')
+      id = message.first["id"]
 
       r = @g.dashboard_version(dashboard_id: id, version: 1)
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be == 200
     end
 
-    it 'get version 15 of dashboard (must be fail)' do
-      search = { query: 'QA Graphite Carbon Metrics' }
+    it "get version 15 of dashboard (must be fail)" do
+      search = { query: "QA Graphite Carbon Metrics" }
       r = @g.search_dashboards( search )
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be == 200
-      message = r.dig('message')
+      message = r["message"]
       expect(message).to be_a(Array)
-      id = message.first.dig('id')
+      id = message.first["id"]
 
       r = @g.dashboard_version(dashboard_id: id, version: 15)
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be == 500
     end
 
-
-    it 'restore dashboard version 2' do
-      search = { query: 'QA Graphite Carbon Metrics' }
+    it "restore dashboard version 2" do
+      search = { query: "QA Graphite Carbon Metrics" }
       r = @g.search_dashboards( search )
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be == 200
-      message = r.dig('message')
+      message = r["message"]
       expect(message).to be_a(Array)
-      id = message.first.dig('id')
+      id = message.first["id"]
 
       r = @g.restore_dashboard(dashboard_id: id, version: 2)
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
     end
 
-
-    it 'compare dashboard versions' do
-      search = { query: 'QA Graphite Carbon Metrics' }
+    it "compare dashboard versions" do
+      search = { query: "QA Graphite Carbon Metrics" }
       r = @g.search_dashboards( search )
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be == 200
-      message = r.dig('message')
+      message = r["message"]
       expect(message).to be_a(Array)
-      id = message.first.dig('id')
+      id = message.first["id"]
 
       params = {
-        'base' => {
-          'dashboard_id' => id,
-          'version' => 1
+        "base" => {
+          "dashboard_id" => id,
+          "version" => 1
         },
-        'new' => {
-          'dashboard_id' => id,
-          'version' => 2
+        "new" => {
+          "dashboard_id" => id,
+          "version" => 2
         }
       }
 
       r = @g.compare_dashboard_version(params)
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
     end
 
-
-
   end
 
+  describe "Annotations" do
 
-  describe 'Annotations' do
-
-    it 'import dashboards from directory' do
-      r = @g.import_dashboards_from_directory('spec/dashboards')
+    it "import dashboards from directory" do
+      r = @g.import_dashboards_from_directory("spec/dashboards")
       expect(r).to be_a(Hash)
       expect(r.count).to be == 2
-      expect(r.select { |k, v| v['status'] == 200 }.count).to be 2
+      expect(r.select { |_k, v| v["status"] == 200 }.count).to be 2
     end
 
-
-    it 'create annotation' do
+    it "create annotation" do
       params = {
         time: Time.now.to_i,
         region: false,
-        tags: [ 'spec', 'test' ],
-        text: 'test annotation'
+        tags: %w[spec test],
+        text: "test annotation"
       }
       r = @g.create_annotation(params)
 
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
-      message = r.dig('message')
+      status  = r["status"]
+      message = r["message"]
       expect(status).to be == 200
       expect(message).to be_a(String)
     end
 
-
-    it 'create graphite annotation' do
+    it "create graphite annotation" do
 
       params = {
-        what: 'spec test graphite annotation',
+        what: "spec test graphite annotation",
         when: Time.now.to_i,
-        tags: [ 'spec', 'test' ],
-        data: 'test annotation'
+        tags: %w[spec test],
+        data: "test annotation"
       }
       r = @g.create_annotation_graphite(params)
 
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
-      message = r.dig('message')
+      status  = r["status"]
+      message = r["message"]
       expect(status).to be == 200
       expect(message).to be_a(String)
     end
 
-
-    it 'update annotation' do
+    it "update annotation" do
 
       params = {
         limit: 5,
-        tags: [ 'spec', 'test' ]
+        tags: %w[spec test]
       }
       r = @g.find_annotation(params)
 
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
-      message = r.dig('message')
+      status  = r["status"]
+      message = r["message"]
       if( status.to_i == 200 )
         message = message.first
-        annotation_id = message.dig('id')
+        annotation_id = message["id"]
       end
 
       params = {
         annotation: annotation_id,
         region: false,
-        tags: [ 'spec', 'test', 'correcting' ],
-        text: 'new text ... (test annotation)'
+        tags: %w[spec test correcting],
+        text: "new text ... (test annotation)"
       }
-      r = @g.update_annotation(params)
+      @g.update_annotation(params)
     end
 
-
-    it 'find annotation' do
+    it "find annotation" do
       params = {
         limit: 10
       }
       r = @g.find_annotation(params)
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
-      message = r.dig('message')
+      status  = r["status"]
+      message = r["message"]
       expect(status).to be == 200
       expect(message).to be_a(Array)
     end
 
-
-    it 'delete annotation' do
+    it "delete annotation" do
       r = @g.delete_annotation(1)
       expect(r).to be_a(Hash)
 #       status  = r.dig('status')
 #       expect(status).to be == 200
     end
 
-    it 'delete annotation by region' do
+    it "delete annotation by region" do
       r = @g.delete_annotation_by_region(1)
       expect(r).to be_a(Hash)
 #       status  = r.dig('status')
@@ -1675,31 +1635,30 @@ describe Grafana do
 
   end
 
+  describe "Playlist" do
 
-  describe 'Playlist' do
-
-    it 'import dashboards from directory' do
-      r = @g.import_dashboards_from_directory('spec/dashboards')
+    it "import dashboards from directory" do
+      r = @g.import_dashboards_from_directory("spec/dashboards")
       expect(r).to be_a(Hash)
       expect(r.count).to be == 2
-      expect(r.select { |k, v| v['status'] == 200 }.count).to eq(2)
+      expect(r.select { |_k, v| v["status"] == 200 }.count).to eq(2)
     end
 
-    it 'create playlist (must be fail)' do
+    it "create playlist (must be fail)" do
 
       params = {
-        name: 'QA Playlist',
-        interval: '2m',
+        name: "QA Playlist",
+        interval: "2m",
         items: []
       }
 
       r = @g.create_playlist( params )
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be == 404
     end
 
-    it 'create playlist with tag' do
+    it "create playlist with tag" do
 
       params = '{
         "name": "QA Playlist",
@@ -1716,11 +1675,11 @@ describe Grafana do
       r = @g.create_playlist( JSON.parse(params) )
       #p r
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be == 200
     end
 
-    it 'create playlist with named dashboard' do
+    it "create playlist with named dashboard" do
 
       params = '{
         "name": "QA Playlist #2",
@@ -1737,64 +1696,64 @@ describe Grafana do
       r = @g.create_playlist( JSON.parse(params) )
       # p r
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be == 200
     end
 
-    it 'get all playlists' do
+    it "get all playlists" do
 
       r = @g.playlists
 
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
-      message = r.dig('message')
+      status  = r["status"]
+      message = r["message"]
       expect(message).to be_a(Array)
       expect(message.count).equal?(2)
       expect(status).to be == 200
     end
 
-    it 'get playlists with id (can fail)' do
+    it "get playlists with id (can fail)" do
 
       r = @g.playlist(4)
 
 #       p r
 
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
 
       if(status == 200)
         expect(status).to be == 200
-        items   = r.dig('items')
+        items   = r["items"]
         expect(items).to be_a(Array)
         # expect(items.count).equal?(6)
       elsif(status == 404)
-        items    = r.dig('items')
-        message  = r.dig('message')
+        items    = r["items"]
+        message  = r["message"]
         expect(items).to be_a(Array)
         expect(message).to be_a(String)
         #expect(items.count).equal?(6)
       else
 
-        expect { raise StandardError, 'this message exactly'}
+        expect { raise StandardError.new("this message exactly")}
       end
     end
 
-    it 'get playlists with name' do
+    it "get playlists with name" do
 
-      r = @g.playlist('QA Playlist')
+      r = @g.playlist("QA Playlist")
 
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
-      playlists = r.dig('playlists')
+      status  = r["status"]
+      playlists = r["playlists"]
       expect(playlists).to be_a(Array)
       #expect(message.count).equal?(2)
       expect(status).to be == 200
     end
 
-    it 'get playlist dashboards by name (must be fail)' do
+    it "get playlist dashboards by name (must be fail)" do
 
-      begin
-        r = @g.playlist_dashboards('fantasy')
+      
+        @g.playlist_dashboards("fantasy")
         #p r
         #
         #expect(r).to be_a(Hash)
@@ -1804,64 +1763,64 @@ describe Grafana do
         #expect(message.count).equal?(2)
         #expect(status).to be == 200
 
-      rescue ArgumentError => error
-        expect(error).to be_a(ArgumentError)
-      end
+      rescue ArgumentError => e
+        expect(e).to be_a(ArgumentError)
+      
 
     end
 
-    it 'get playlist dashboards by id' do
+    it "get playlist dashboards by id" do
 
       r = @g.playlist_dashboards(3)
 
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
-      message = r.dig('message')
+      r["status"]
+      r["message"]
 #       expect(message).to be_a(Array)
 #       expect(message.count).equal?(2)
       #expect(status).to be == 200
     end
 
-    it 'get playlist dashboards by id (must be fail)' do
+    it "get playlist dashboards by id (must be fail)" do
 
       r = @g.playlist_dashboards(1000)
 
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
-      message = r.dig('message')
+      status  = r["status"]
+      message = r["message"]
       expect(message).to be_a(String)
       expect(status).to be == 404
     end
 
-    it 'get playlist items for playlist by id (must be fail)' do
+    it "get playlist items for playlist by id (must be fail)" do
 
       r = @g.playlist_items(1000)
 
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
-      message = r.dig('message')
+      status  = r["status"]
+      message = r["message"]
       expect(message).to be_a(String)
       expect(status).to be == 404
     end
 
-    it 'get playlist items for playlist by name (must be fail)' do
+    it "get playlist items for playlist by name (must be fail)" do
 
-      r = @g.playlist_items('fantasy lines')
+      r = @g.playlist_items("fantasy lines")
 
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
-      message = r.dig('message')
+      status  = r["status"]
+      message = r["message"]
       expect(message).to be_a(String)
       expect(status).to be == 404
     end
 
-    it 'get playlist items for playlist by id' do
+    it "get playlist items for playlist by id" do
 
       r = @g.playlist_items(4)
 
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
-      message = r.dig('message')
+      status  = r["status"]
+      message = r["message"]
 
       if(status == 200)
         expect(status).to be == 200
@@ -1870,7 +1829,7 @@ describe Grafana do
       elsif(status == 404)
         expect(message).to be_a(String)
       else
-        expect { raise StandardError, 'this message exactly'}
+        expect { raise StandardError.new("this message exactly")}
       end
 #      message = r.dig('message')
 #      expect(message).to be_a(Array)
@@ -1878,13 +1837,13 @@ describe Grafana do
 #      expect(status).to be == 200
     end
 
-    it 'get playlist items for playlist by name (can fail)' do
+    it "get playlist items for playlist by name (can fail)" do
 
-      r = @g.playlist_items( 'QA Playlist' )
+      r = @g.playlist_items( "QA Playlist" )
 
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
-      message = r.dig('message')
+      status  = r["status"]
+      message = r["message"]
       expect(status).to be_a(Integer)
 
       if(message.is_a?(Array))
@@ -1894,30 +1853,27 @@ describe Grafana do
       end
     end
 
-    it 'get playlist items for playlist by name' do
+    it "get playlist items for playlist by name" do
 
-      r = @g.playlist_items( 'QA Playlist', true )
+      r = @g.playlist_items( "QA Playlist", true )
 
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
-      message = r.dig('message')
+      status  = r["status"]
+      message = r["message"]
       expect(message).to be_a(Array)
       expect(message.count).equal?(1)
       expect(status).to be == 200
     end
 
-
-
-
-    it 'delete playlist by id' do
+    it "delete playlist by id" do
 
       r = @g.delete_playlist( 196 )
 
 #       p r
 
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
-      message = r.dig('message')
+      status  = r["status"]
+      message = r["message"]
 
       if(status == 200)
         expect(status).to be == 200
@@ -1926,7 +1882,7 @@ describe Grafana do
       elsif(status == 404)
         expect(message).to be_a(String)
       else
-        expect { raise StandardError, 'wrong status code'}
+        expect { raise StandardError.new("wrong status code")}
       end
 
       #expect(message).to be_a(Array)
@@ -1952,193 +1908,191 @@ describe Grafana do
 #      end
 #    end
 #
-    it 'delete multiple playlist by name' do
+    it "delete multiple playlist by name" do
 
-      r = @g.delete_playlist( 'QA Playlist', true )
+      r = @g.delete_playlist( "QA Playlist", true )
 
 #       p r
 
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
-      message = r.dig('message')
+      r["status"]
+      r["message"]
       #expect(message).to be_a(Array)
       #expect(message.count).equal?(1)
       #expect(status).to be == 200
     end
 
-
   end
 
+  describe "Folder" do
 
-  describe 'Folder' do
-
-    it 'create folder \'spec-test-first\'' do
-      version, major_version = @g.version.values
-      r = @g.create_folder( title: 'foo', uid: 'spec-test-first' )
+    it "create folder 'spec-test-first'" do
+      _, major_version = @g.version.values
+      r = @g.create_folder( title: "foo", uid: "spec-test-first" )
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
 
       expect(status).to be == 200 if(major_version >= 5)
       expect(status).to be == 404 if(major_version < 5)
     end
 
-    it 'create folder \'spec-test-second\'' do
-      version, major_version = @g.version.values
-      r = @g.create_folder( title: 'bar', uid: 'spec-test-second' )
+    it "create folder 'spec-test-second'" do
+      _, major_version = @g.version.values
+      r = @g.create_folder( title: "bar", uid: "spec-test-second" )
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
 
       expect(status).to be == 200 if(major_version >= 5)
       expect(status).to be == 404 if(major_version < 5)
     end
 
-    it 'create folder \'spec-test-second\' (again)' do
-      version, major_version = @g.version.values
-      r = @g.create_folder( title: 'bar', uid: 'spec-test-second' )
+    it "create folder 'spec-test-second' (again)" do
+      _, major_version = @g.version.values
+      r = @g.create_folder( title: "bar", uid: "spec-test-second" )
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
 
       expect(status).to be == 412 if(major_version >= 5)
       expect(status).to be == 404 if(major_version < 5)
     end
 
-    it 'create folder \'iNpScWISEMGRt8EuNA8nyCB0UMb1e8MazJAAHDoFn\' (uid to long)' do
-      version, major_version = @g.version.values
-      r = @g.create_folder( title: 'long uid', uid: 'iNpScWISEMGRt8EuNA8nyCB0UMb1e8MazJAAHDoFn' )
+    it "create folder 'iNpScWISEMGRt8EuNA8nyCB0UMb1e8MazJAAHDoFn' (uid to long)" do
+      _, major_version = @g.version.values
+      r = @g.create_folder( title: "long uid", uid: "iNpScWISEMGRt8EuNA8nyCB0UMb1e8MazJAAHDoFn" )
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
 
       expect(status).to be == 404 if(major_version >= 5)
       expect(status).to be == 404 if(major_version < 5)
     end
 
-    it 'get all folders' do
-      version, major_version = @g.version.values
+    it "get all folders" do
+      _, major_version = @g.version.values
       r = @g.folders
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
 
       expect(status).to be == 200 if(major_version >= 5)
       expect(status).to be == 404 if(major_version < 5)
     end
 
-    it 'get folder by id 999 (must be fail)' do
-      version, major_version = @g.version.values
+    it "get folder by id 999 (must be fail)" do
+      @g.version.values
       r = @g.folder(999)
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
       expect(status).to be == 404
     end
 
-    it 'get folder by name \'spec-test-second\'' do
-      version, major_version = @g.version.values
-      r = @g.folder('spec-test-second')
+    it "get folder by name 'spec-test-second'" do
+      _, major_version = @g.version.values
+      r = @g.folder("spec-test-second")
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
 
       expect(status).to be == 200 if(major_version >= 5)
       expect(status).to be == 404 if(major_version < 5)
     end
 
-    it 'update folder \'spec-test-second\'' do
-      version, major_version = @g.version.values
+    it "update folder 'spec-test-second'" do
+      _, major_version = @g.version.values
       r = @g.update_folder(
-        uid: 'spec-test-second',
-        title: 'new name',
+        uid: "spec-test-second",
+        title: "new name",
         overwrite: true
       )
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
 
       expect(status).to be == 200 if(major_version >= 5)
       expect(status).to be == 404 if(major_version < 5)
     end
 
-    it 'update folder \'spec-test-second\' with new uid and overwrite' do
-      version, major_version = @g.version.values
+    it "update folder 'spec-test-second' with new uid and overwrite" do
+      _, major_version = @g.version.values
       r = @g.update_folder(
-        uid: 'spec-test-second',
-        title: 'new name',
-        new_uid: 'flupp-di-wupp',
+        uid: "spec-test-second",
+        title: "new name",
+        new_uid: "flupp-di-wupp",
         overwrite: true
       )
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
 
       expect(status).to be == 200 if(major_version >= 5)
       expect(status).to be == 404 if(major_version < 5)
     end
 
-    it 'update folder \'flupp-di-wupp\' with new uid without overwrite (must be fail)' do
-      version, major_version = @g.version.values
+    it "update folder 'flupp-di-wupp' with new uid without overwrite (must be fail)" do
+      _, major_version = @g.version.values
       r = @g.update_folder(
-        uid: 'flupp-di-wupp',
-        title: 'new name',
-        new_uid: 'spec-test-second'
+        uid: "flupp-di-wupp",
+        title: "new name",
+        new_uid: "spec-test-second"
       )
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
 
       expect(status).to be == 412 if(major_version >= 5)
       expect(status).to be == 404 if(major_version < 5)
     end
 
-    it 'update non existing folder \'spec-test-second-2\' (must be fail)' do
-      version, major_version = @g.version.values
+    it "update non existing folder 'spec-test-second-2' (must be fail)" do
+      _, major_version = @g.version.values
       r = @g.update_folder(
-        uid: 'spec-test-second-2',
-        title: 'new name',
-        new_uid: 'flupp-di-wupp'
+        uid: "spec-test-second-2",
+        title: "new name",
+        new_uid: "flupp-di-wupp"
       )
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
 
       expect(status).to be == 404 if(major_version >= 5)
       expect(status).to be == 404 if(major_version < 5)
     end
 
-    it 'update folder \'spec-test-second\' and give them an existing uid (must be fail)' do
-      version, major_version = @g.version.values
+    it "update folder 'spec-test-second' and give them an existing uid (must be fail)" do
+      _, major_version = @g.version.values
       r = @g.update_folder(
-        uid: 'spec-test-second',
-        title: 'new name',
-        new_uid: 'spec-test-first'
+        uid: "spec-test-second",
+        title: "new name",
+        new_uid: "spec-test-first"
       )
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
 
       expect(status).to be == 404 if(major_version >= 5)
       expect(status).to be == 404 if(major_version < 5)
     end
 
-    it 'delete folder' do
-      version, major_version = @g.version.values
-      r = @g.delete_folder( 'spec-test-first' )
+    it "delete folder" do
+      _, major_version = @g.version.values
+      r = @g.delete_folder( "spec-test-first" )
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
 
       expect(status).to be == 200 if(major_version >= 5)
       expect(status).to be == 404 if(major_version < 5)
     end
 
-    it 'delete folder' do
-      version, major_version = @g.version.values
-      r = @g.delete_folder( 'flupp-di-wupp' )
+    it "delete folder" do
+      _, major_version = @g.version.values
+      r = @g.delete_folder( "flupp-di-wupp" )
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
 
       expect(status).to be == 200 if(major_version >= 5)
@@ -2146,91 +2100,88 @@ describe Grafana do
     end
   end
 
+  describe "Folder permissions" do
 
-  describe 'Folder permissions' do
-
-
-    it 'create folder \'spec-test-first\'' do
-      version, major_version = @g.version.values
-      r = @g.create_folder( title: 'bar', uid: 'spec-test-first' )
+    it "create folder 'spec-test-first'" do
+      _, major_version = @g.version.values
+      r = @g.create_folder( title: "bar", uid: "spec-test-first" )
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
 
       expect(status).to be == 200 if(major_version >= 5)
       expect(status).to be == 404 if(major_version < 5)
     end
 
-    it 'get folder permissions for \'spec-test-first\'' do
-      version, major_version = @g.version.values
-      r = @g.folder_permissions( 'spec-test-first' )
+    it "get folder permissions for 'spec-test-first'" do
+      _, major_version = @g.version.values
+      r = @g.folder_permissions( "spec-test-first" )
 
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
 
       expect(status).to be == 200 if(major_version >= 5)
       expect(status).to be == 404 if(major_version < 5)
     end
 
-    it 'get folder permissions for \'spec-test-second\' (must be fail)' do
-      version, major_version = @g.version.values
-      r = @g.folder_permissions( 'spec-test-second' )
+    it "get folder permissions for 'spec-test-second' (must be fail)" do
+      _, major_version = @g.version.values
+      r = @g.folder_permissions( "spec-test-second" )
 
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
 
       expect(status).to be == 404 if(major_version >= 5)
       expect(status).to be == 404 if(major_version < 5)
     end
 
-
-    it 'add team \'team alpha\'' do
-      r = @g.add_team(name: 'team alpha')
+    it "add team 'team alpha'" do
+      r = @g.add_team(name: "team alpha")
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be == 200
     end
 
-    it 'add team \'team beta\'' do
-      r = @g.add_team(name: 'team beta')
+    it "add team 'team beta'" do
+      r = @g.add_team(name: "team beta")
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be == 200
     end
 
-    it 'add temporary User' do
+    it "add temporary User" do
       r = @g.add_user(
-        user_name:'foo',
-        email: 'foo@foo-bar.tld',
-        password: 'pass'
+        user_name:"foo",
+        email: "foo@foo-bar.tld",
+        password: "pass"
       )
       expect(r).to be_a(Hash)
 
-      status = r.dig('status')
-      id = r.dig('id')
-      message = r.dig('message')
+      status = r["status"]
+      id = r["id"]
+      r["message"]
       expect(r).to be_a(Hash)
       expect(status).to be_a(Integer)
       expect(id).to be_a(Integer)
     end
 
-    it 'update folder permissions for \'spec-test-first\'' do
-      version, major_version = @g.version.values
+    it "update folder permissions for 'spec-test-first'" do
+      _, major_version = @g.version.values
 
       params = {
-        folder: 'spec-test-first',
+        folder: "spec-test-first",
         permissions: {
           team: [
-            { 'team beta' => 'View' },
-            { 'team alpha' => 'Viewer' },
-            { 'team beta' => 'Editor' },
-            { 'team alpha' => 'Edit' }
+            { "team beta" => "View" },
+            { "team alpha" => "Viewer" },
+            { "team beta" => "Editor" },
+            { "team alpha" => "Edit" }
           ],
           user: [
-            { 'qa' => 'Admin' },
-            { 'foo' => 'View' }
+            { "qa" => "Admin" },
+            { "foo" => "View" }
           ]
         }
       }
@@ -2238,43 +2189,40 @@ describe Grafana do
       r = @g.update_folder_permissions( params )
 
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
 
       expect(status).to be == 200 if(major_version >= 5)
       expect(status).to be == 404 if(major_version < 5)
     end
 
-
-
-
-    it 'delete team \'team alpha\'' do
-      r = @g.delete_team('team alpha')
+    it "delete team 'team alpha'" do
+      r = @g.delete_team("team alpha")
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be == 200
     end
 
-    it 'delete team \'team beta\'' do
-      r = @g.delete_team('team beta')
+    it "delete team 'team beta'" do
+      r = @g.delete_team("team beta")
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be == 200
     end
 
-    it 'delete temporary User' do
-      r = @g.delete_user('foo@foo-bar.tld')
+    it "delete temporary User" do
+      r = @g.delete_user("foo@foo-bar.tld")
       expect(r).to be_a(Hash)
-      status = r.dig('status')
+      status = r["status"]
       expect(status).to be_a(Integer)
       expect(status).to be == 200
     end
 
-    it 'delete folder' do
-      version, major_version = @g.version.values
-      r = @g.delete_folder( 'spec-test-first' )
+    it "delete folder" do
+      _, major_version = @g.version.values
+      r = @g.delete_folder( "spec-test-first" )
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
 
       expect(status).to be == 200 if(major_version >= 5)
@@ -2283,77 +2231,76 @@ describe Grafana do
 
   end
 
+  describe "Folder search" do
 
-  describe 'Folder search' do
+    it "search folder and dashboard (wrong type, must be fail)" do
 
-    it 'search folder and dashboard (wrong type, must be fail)' do
-
-      version, major_version = @g.version.values
+      _, major_version = @g.version.values
 
       params = {
-        type: 'foo'
+        type: "foo"
       }
       r = @g.folder_and_dashboard_search(params)
 
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
 
       expect(status).to be == 404 if(major_version >= 5)
       expect(status).to be == 404 if(major_version < 5)
     end
 
-    it 'search folder and dashboard (without all parameters)' do
+    it "search folder and dashboard (without all parameters)" do
 
-      version, major_version = @g.version.values
+      _, major_version = @g.version.values
 
       params = {}
       r = @g.folder_and_dashboard_search(params)
 
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
 
       expect(status).to be == 200 if(major_version >= 5)
       expect(status).to be == 404 if(major_version < 5)
     end
 
-    it 'search folder and dashboard (dash-folder)' do
+    it "search folder and dashboard (dash-folder)" do
 
-      version, major_version = @g.version.values
+      _, major_version = @g.version.values
 
       params = {
-        type: 'dash-folder'
+        type: "dash-folder"
       }
       r = @g.folder_and_dashboard_search(params)
 
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
 
       expect(status).to be == 200 if(major_version >= 5)
       expect(status).to be == 404 if(major_version < 5)
     end
 
-    it 'search folder and dashboard (dash-db)' do
+    it "search folder and dashboard (dash-db)" do
 
-      version, major_version = @g.version.values
+      _, major_version = @g.version.values
 
       params = {
-        type: 'dash-db'
+        type: "dash-db"
       }
       r = @g.folder_and_dashboard_search(params)
 
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
 
       expect(status).to be == 200 if(major_version >= 5)
       expect(status).to be == 404 if(major_version < 5)
     end
 
-    it 'search folder and dashboard (folderId, starred)' do
-      version, major_version = @g.version.values
+    it "search folder and dashboard (folderId, starred)" do
+      _, major_version = @g.version.values
 
       params = {
         folderIds: 0,
@@ -2362,15 +2309,15 @@ describe Grafana do
       r = @g.folder_and_dashboard_search(params)
 
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
 
       expect(status).to be == 200 if(major_version >= 5)
       expect(status).to be == 404 if(major_version < 5)
     end
 
-    it 'search folder and dashboard (starred)' do
-      version, major_version = @g.version.values
+    it "search folder and dashboard (starred)" do
+      _, major_version = @g.version.values
 
       params = {
         starred: true
@@ -2378,57 +2325,57 @@ describe Grafana do
       r = @g.folder_and_dashboard_search(params)
 
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
 
       expect(status).to be == 200 if(major_version >= 5)
       expect(status).to be == 404 if(major_version < 5)
     end
 
-    it 'search folder and dashboard (query, starred, tag)' do
-      version, major_version = @g.version.values
+    it "search folder and dashboard (query, starred, tag)" do
+      _, major_version = @g.version.values
 
       params = {
-        query: 'QA Graphite Carbon Metrics',
+        query: "QA Graphite Carbon Metrics",
         starred: false,
-        tag: 'QA'
+        tag: "QA"
       }
       r = @g.folder_and_dashboard_search(params)
 
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
 
       expect(status).to be == 200 if(major_version >= 5)
       expect(status).to be == 404 if(major_version < 5)
     end
 
-    it 'search folder and dashboard (query)' do
-      version, major_version = @g.version.values
+    it "search folder and dashboard (query)" do
+      _, major_version = @g.version.values
 
       params = {
-        query: 'QA Internal Grafana Stats'
+        query: "QA Internal Grafana Stats"
       }
       r = @g.folder_and_dashboard_search(params)
 
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
 
       expect(status).to be == 200 if(major_version >= 5)
       expect(status).to be == 404 if(major_version < 5)
     end
 
-    it 'search folder and dashboard (tags)' do
-      version, major_version = @g.version.values
+    it "search folder and dashboard (tags)" do
+      _, major_version = @g.version.values
 
       params = {
-        tag: 'QA'
+        tag: "QA"
       }
       r = @g.folder_and_dashboard_search(params)
 
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
 
       expect(status).to be == 200 if(major_version >= 5)
@@ -2437,31 +2384,29 @@ describe Grafana do
 
   end
 
+  describe "remove demo data" do
 
-
-  describe 'remove demo data' do
-
-    it 'Delete an existing data source \'graphite\' (by name)' do
-      r = @g.delete_datasource('graphite')
+    it "Delete an existing data source 'graphite' (by name)" do
+      r = @g.delete_datasource("graphite")
       expect(r).to be_a(Hash)
-      status  = r.dig('status')
+      status  = r["status"]
       expect(status).to be_a(Integer)
       expect(status).to be == 200
     end
 
-    it 'delete dashboard' do
-      search = { tags: 'QA' }
+    it "delete dashboard" do
+      search = { tags: "QA" }
       r = @g.search_dashboards( search )
       expect(r).to be_a(Hash)
-      message = r.dig('message')
+      message = r["message"]
       expect(message).to be_a(Array)
       expect(message.count).equal?(2)
 
       message.each do |m|
-        title = m.dig('title')
+        title = m["title"]
         r = @g.delete_dashboard(title)
         expect(r).to be_a(Hash)
-        status  = r.dig('status')
+        status  = r["status"]
         expect(status).to be == 200
       end
 

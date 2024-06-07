@@ -1,15 +1,26 @@
 AllCops:
-  TargetRubyVersion: 2.0
-
-AllCops:
+  TargetRubyVersion: 3.0
   Exclude:
     - examples/*
     - spec/*
   NewCops: disable
 
-# Disables "Use nested module/class definitions instead of compact style" warning
-ClassAndModuleChildren:
-  Enabled: false
+Layout:
+  Enabled: False
+
+# Increases "Line is too long" warning from 80 tp 200
+Layout/LineLength:
+  Max: 250
+  Enabled: true
+
+Layout/EmptyLines:
+  Enabled: true
+
+Layout/EmptyLineAfterGuardClause:
+  Enabled: true
+
+Layout/EmptyLinesAroundMethodBody:
+  Enabled: true
 
 # Increases "Class definition is too long" warning from 100 to 200
 Metrics/ClassLength:
@@ -31,28 +42,18 @@ Metrics/AbcSize:
 Metrics/BlockLength:
   Max: 190
 
+Metrics/CyclomaticComplexity:
+  Enabled: false
+
+Metrics/PerceivedComplexity:
+  Enabled: false
+
+# Disables "Use nested module/class definitions instead of compact style" warning
+Style/ClassAndModuleChildren:
+  Enabled: false
+
 # Disables "Missing top-level class documentation comment" warning
-Documentation:
-  Enabled: false
-
-# Increases "Line is too long" warning from 80 tp 200
-Layout/LineLength:
-  Max: 250
-  Enabled: true
-
-Layout/EmptyLines:
-  Enabled: true
-
-Layout/EmptyLineAfterGuardClause:
-  Enabled: true
-
-Layout/EmptyLinesAroundMethodBody:
-  Enabled: true
-
-CyclomaticComplexity:
-  Enabled: false
-
-PerceivedComplexity:
+Style/Documentation:
   Enabled: false
 
 Style/Encoding:
@@ -60,6 +61,9 @@ Style/Encoding:
 
 Style/FormatStringToken:
   EnforcedStyle: unannotated
+
+Style/HashSyntax:
+  EnforcedStyle: ruby19
 
 Style/OptionalBooleanParameter:
   AllowedMethods: [playlist_items, delete_playlist]
@@ -70,9 +74,6 @@ Style/StringLiterals:
 
 Style/RaiseArgs:
   EnforcedStyle: compact
-
-Layout:
-  Enabled: False
 
 Style/RescueStandardError:
   Enabled: False
