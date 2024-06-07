@@ -25,8 +25,6 @@ module Grafana
     #
     # The name parameter returns a single team if the parameter matches the name field.
 
-
-
     #
     # Status Codes:
     #
@@ -36,7 +34,6 @@ module Grafana
     # 404 - Team not found (if searching by name)
     #
     def search_team( params )
-
       raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
       raise ArgumentError.new("missing 'params'") if( params.empty? )
 
@@ -75,7 +72,6 @@ module Grafana
     #
     #
     def team( team_id )
-
       raise ArgumentError.new(format("wrong type. user 'team_id' must be an String (for an Team name) or an Integer (for an Team Id), given '%s'", team_id.class.to_s)) if  team_id.is_a?(String) && team_id.is_a?(Integer) 
       raise ArgumentError.new("missing 'team_id'") if( team_id.empty? )
 
@@ -107,7 +103,6 @@ module Grafana
     #
     #
     def add_team( params )
-
       raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
       raise ArgumentError.new("missing 'params'") if( params.empty? )
 
@@ -145,7 +140,6 @@ module Grafana
     # PUT /api/teams/:id
     #
     def update_team( params )
-
       raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
       raise ArgumentError.new("missing 'params'") if( params.empty? )
 
@@ -191,7 +185,6 @@ module Grafana
     #
     #
     def delete_team(team_id)
-
       raise ArgumentError.new(format("wrong type. user 'team_id' must be an String (for an Team name) or an Integer (for an Team Id), given '%s'", team_id.class.to_s)) if  team_id.is_a?(String) && team_id.is_a?(Integer) 
       raise ArgumentError.new("missing 'team_id'") if( team_id.empty? )
 
@@ -226,7 +219,6 @@ module Grafana
     #
     #
     def team_members(team_id)
-
       raise ArgumentError.new(format("wrong type. user 'team_id' must be an String (for an Team name) or an Integer (for an Team Id), given '%s'", team_id.class.to_s)) if  team_id.is_a?(String) && team_id.is_a?(Integer) 
       raise ArgumentError.new("missing 'team_id'") if( team_id.empty? )
 
@@ -261,7 +253,6 @@ module Grafana
     #
     #
     def add_team_member(params)
-
       raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
       raise ArgumentError.new("missing 'params'") if( params.empty? )
 
@@ -312,7 +303,6 @@ module Grafana
     #
     #
     def remove_team_member(params)
-
       raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
       raise ArgumentError.new("missing 'params'") if( params.empty? )
 

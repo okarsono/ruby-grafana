@@ -18,7 +18,6 @@ module Grafana
     #  - starred - Flag indicating if only starred Dashboards should be returned
     #  - limit - Limit the number of returned results
     def folder_and_dashboard_search(params)
-
       raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
 
       v, mv = version.values

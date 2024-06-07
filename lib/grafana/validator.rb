@@ -43,7 +43,6 @@ module Grafana
     # @return [Mixed]
     #
     def validate_hash( value, valid_params )
-
 #       puts "validate_hash( #{value}, #{valid_params} )"
 
       unless( valid_params.collect(&:downcase).include?(value.downcase) )

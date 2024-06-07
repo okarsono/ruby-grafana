@@ -47,7 +47,6 @@ module Grafana
       request( "DELETE", endpoint )
     end
 
-
     private
     # helper function for all request methods
     #
@@ -61,7 +60,6 @@ module Grafana
     # @return [Hash]
     #
     def request( method_type = "GET", endpoint = "/", data = {} )
-
       logger.debug( "request( method_type: #{method_type}, endpoint: #{endpoint}, data )" )
 
       raise "try first login()" if @api_instance.nil?
@@ -163,11 +161,9 @@ module Grafana
         if( ( response_code >= 200 && response_code <= 299 ) || ( response_code >= 400 && response_code <= 499 ) )
 
           return { "status" => response_code, "message" => response_body } unless  response_body =~ /^\[.*\]$/ || response_body =~ /^\{.*\}$/
+
             result = JSON.parse( response_body )
             return { "status" => response_code, "message" => result } if( result.is_a?(Array) )
-
-
-
 
           result_status     = result["status"] if( result.is_a?( Hash ) )
           result["message"] = result_status unless( result_status.nil? )

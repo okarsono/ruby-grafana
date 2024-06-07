@@ -24,7 +24,6 @@ module Grafana
     # @return [Hash]
     #
     def expand_tags( params )
-
       raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
       raise ArgumentError.new("missing 'params'") if( params.empty? )
 

@@ -22,7 +22,6 @@ module Grafana
     #
     # Gets all existing permissions for the folder with the given uid.
     def folder_permissions( folder_id )
-
       v, mv = version.values
       return { "status" => 404, "message" => format( "folder has been supported in Grafana since version 5. you use version %s", v) } if(mv < 5)
 
@@ -37,7 +36,6 @@ module Grafana
       get(endpoint)
     end
 
-
     # Update permissions for a folder
     # POST /api/folders/:uid/permissions
     #
@@ -49,7 +47,6 @@ module Grafana
     # items - The permission items to add/update. Items that are omitted from the list will be removed.
     #
     def update_folder_permissions( params )
-
       raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
       raise ArgumentError.new("missing 'params'") if( params.empty? )
 
@@ -135,7 +132,6 @@ module Grafana
 
       post(endpoint, payload.to_json)
     end
-
 
 #    private
 #    def validate_hash( value, valid_params )

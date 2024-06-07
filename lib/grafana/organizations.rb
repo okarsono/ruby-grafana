@@ -23,7 +23,6 @@ module Grafana
     # @return [Hash]
     #
     def organization( organisation_id )
-
       if( organisation_id.is_a?(String) && organisation_id.is_a?(Integer))
         raise ArgumentError.new(format("wrong type. 'organisation_id' must be an String (for an Datasource name) " \
                                        "or an Integer (for an Datasource Id), given '%s'", organisation_id.class.to_s))
@@ -55,7 +54,6 @@ module Grafana
     # @return [Hash]
     #
     def update_organization( params )
-
       raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
       raise ArgumentError.new("missing 'params'") if( params.empty? )
 
@@ -86,7 +84,6 @@ module Grafana
     # @return [Hash]
     #
     def organization_users( organization_id )
-
       if( organization_id.is_a?(String) && organization_id.is_a?(Integer))
         raise ArgumentError.new(format("wrong type. 'organization_id' must be an String (for an Organisation name) "\
                                        "or an Integer (for an Organisation Id), given '%s'", organization_id.class.to_s))
@@ -124,7 +121,6 @@ module Grafana
     # @return [Hash]
     #
     def add_user_to_organization( params )
-
       data   = validate_organisation_user( params )
       status = data["status"]
 
@@ -167,7 +163,6 @@ module Grafana
     # @return [Hash]
     #
     def update_organization_user( params )
-
       data   = validate_organisation_user( params )
       status = data["status"]
 
@@ -207,7 +202,6 @@ module Grafana
     # @return [Hash]
     #
     def delete_user_from_organization( params )
-
       raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
       raise ArgumentError.new("missing 'params'") if( params.empty? )
 
@@ -243,7 +237,6 @@ module Grafana
     # @return [Hash]
     #
     def create_organisation( params )
-
       raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
       raise ArgumentError.new("missing 'params'") if( params.empty? )
 
@@ -272,7 +265,6 @@ module Grafana
     # @return [Hash]
     #
     def delete_organisation( organisation_id )
-
       if( organisation_id.is_a?(String) && organisation_id.is_a?(Integer) )
         raise ArgumentError.new(format("wrong type. 'organisation_id' must be an String (for an Organisation name) " \
                                        "or an Integer (for an Organisation Id), given '%s'", organisation_id.class.to_s))
@@ -296,7 +288,6 @@ module Grafana
       delete(endpoint)
     end
 
-
     private
     # validate an user for an organisation
     #
@@ -311,7 +302,6 @@ module Grafana
     # @return [Hash]
     #
     def validate_organisation_user( params )
-
       raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
       raise ArgumentError.new("missing 'params'") if( params.empty? )
 
@@ -345,7 +335,6 @@ module Grafana
         "role" => role
       }
     end
-
 
   end
 end

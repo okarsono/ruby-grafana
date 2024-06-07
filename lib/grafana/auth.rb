@@ -20,7 +20,6 @@ module Grafana
     #
     # GET /api/auth/keys
     def api_keys
-
       endpoint = "/api/auth/keys"
 
       @logger.debug("Attempting to get all existing api keys (GET #{endpoint})") if @debug
@@ -28,9 +27,7 @@ module Grafana
       get( endpoint )
     end
 
-
     def api_key( api_id )
-
       raise ArgumentError.new(format("wrong type. API token 'api_id' must be an String (for an API name) or an Integer (for an API Id), given '%s'", api_id.class.to_s)) if  api_id.is_a?(String) && api_id.is_a?(Integer) 
       raise ArgumentError.new("missing 'api_id'") if( api_id.empty? )
 
@@ -53,9 +50,7 @@ module Grafana
       end
 
       { "status" => 200, "message" => u }
-
     end
-
 
     # Create API Key
     #
@@ -75,7 +70,6 @@ module Grafana
     # @example:
     #
     def create_api_key( params )
-
       raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
       raise ArgumentError.new("missing 'params'") if( params.empty? )
 
@@ -115,14 +109,12 @@ module Grafana
       @logger.debug("create API token (POST #{endpoint})") if @debug
 
       post(endpoint, payload.to_json)
-
     end
 
     # Delete API Key
     #
     # DELETE /api/auth/keys/:id
     def delete_api_key( key_id )
-
       raise ArgumentError.new(format("wrong type. 'key_id' must be an String (for an API Key name) or an Integer (for an API Key Id), given '%s'", key_id.class.to_s)) if  key_id.is_a?(String) && key_id.is_a?(Integer) 
       raise ArgumentError.new("missing 'key_id'") if( key_id.empty? )
 
@@ -139,7 +131,6 @@ module Grafana
       logger.debug("Deleting API key #{key_id} (DELETE #{endpoint})") if @debug
 
       delete(endpoint)
-
     end
 
   end

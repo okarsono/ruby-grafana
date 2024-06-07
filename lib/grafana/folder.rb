@@ -15,7 +15,6 @@ module Grafana
     # @return [Hash]
     #
     def folders
-
       v, mv = version.values
       return { "status" => 404, "message" => format( "folder has been supported in Grafana since version 5. you use version %s", v) } if(mv < 5)
 
@@ -34,7 +33,6 @@ module Grafana
     #
     # Will return the folder identified by id.
     def folder( folder_uid )
-
       raise ArgumentError.new(format("wrong type. user 'folder_uid' must be an String (for an Folder Uid) or an Integer (for an Folder Id), given '%s'", folder_uid.class.to_s)) \
           if( folder_uid.is_a?(String) && folder_uid.is_a?(Integer) )
       raise ArgumentError.new("missing 'folder_uid'") if( folder_uid.empty? )
@@ -78,7 +76,6 @@ module Grafana
     #   uid   - Optional unique identifier.
     #   title - The title of the folder.
     def create_folder( params )
-
       raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
       raise ArgumentError.new("missing 'params'") if( params.empty? )
 
@@ -120,7 +117,6 @@ module Grafana
     #   - version - Provide the current version to be able to update the folder. Not needed if overwrite=true.
     #   - overwrite - Set to true if you want to overwrite existing folder with newer version.
     def update_folder( params )
-
       raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
       raise ArgumentError.new("missing 'params'") if( params.empty? )
 
@@ -156,14 +152,12 @@ module Grafana
       put( endpoint, payload.to_json )
     end
 
-
     # Delete folder
     # DELETE /api/folders/:uid
     #
     # Deletes an existing folder identified by uid together with all dashboards stored in the folder, if any.
     # This operation cannot be reverted.
     def delete_folder( folder_uid )
-
       raise ArgumentError.new(format("wrong type. user 'folder_uid' must be an String (for an Folder Uid) or an Integer (for an Folder Id), given '%s'", folder_uid.class.to_s)) \
           if( folder_uid.is_a?(String) && folder_uid.is_a?(Integer) )
       raise ArgumentError.new("missing 'folder_uid'") if( folder_uid.empty? )
@@ -192,7 +186,6 @@ module Grafana
       @logger.debug("deleting folder by uid #{folder_uid} (GET #{endpoint})") if @debug
       delete(endpoint)
     end
-
 
   end
 end

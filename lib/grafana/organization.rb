@@ -33,7 +33,6 @@ module Grafana
     # @return [Hash]
     #
     def update_current_organization( params )
-
       raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
       raise ArgumentError.new("missing 'params'") if( params.empty? )
 
@@ -77,7 +76,6 @@ module Grafana
     # @return [Hash]
     #
     def add_user_to_current_organization( params )
-
       raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
       raise ArgumentError.new("missing 'params'") if( params.empty? )
 
@@ -121,10 +119,8 @@ module Grafana
     # Updates the given user
     # PATCH /api/org/users/:userId
 
-
     # Delete user in actual organisation
     # DELETE /api/org/users/:userId
-
 
     #
 

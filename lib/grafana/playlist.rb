@@ -54,7 +54,6 @@ module Grafana
     #]
     #```
     def playlists
-
       endpoint = "/api/playlists"
 
       @logger.debug("Attempting to get all existing playlists (GET #{endpoint})") if @debug
@@ -110,7 +109,6 @@ module Grafana
     #```
 
     def playlist( playlist_id )
-
       raise ArgumentError.new(format("wrong type. 'playlist_id' must be an String (for an Playlist name) or an Integer (for an Playlist Id), given '%s'", playlist_id.class.to_s)) if  playlist_id.is_a?(String) && playlist_id.is_a?(Integer) 
       raise ArgumentError.new("missing 'playlist_id'") if( playlist_id.empty? )
 
@@ -184,7 +182,6 @@ module Grafana
     #```
 
     def playlist_items( playlist_id, multi_result = false )
-
       raise ArgumentError.new(format("wrong type. 'playlist_id' must be an String (for an playlist name) or an Integer (for an playlist Id), given '%s'", playlist_id.class.to_s)) if  playlist_id.is_a?(String) && playlist_id.is_a?(Integer) 
       raise ArgumentError.new("missing 'playlist_id'") if( playlist_id.empty? )
 
@@ -250,7 +247,6 @@ module Grafana
     #```
 
     def playlist_dashboards( playlist_id )
-
       raise ArgumentError.new(format("wrong type. 'playlist_id' must be an Integer, given '%s'", playlist_id.class)) unless( playlist_id.is_a?(Integer) )
       raise ArgumentError.new("missing 'playlist_id'") if( playlist_id.empty? )
 
@@ -304,7 +300,6 @@ module Grafana
     #```
 
     def create_playlist( params )
-
       raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
       raise ArgumentError.new("missing 'params'") if( params.empty? )
 
@@ -396,7 +391,6 @@ module Grafana
     #```
 
     def update_playlist( params )
-
       raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
       raise ArgumentError.new("missing 'params'") if( params.empty? )
 
@@ -441,9 +435,7 @@ module Grafana
       endpoint = format( "/api/playlists/%d", playlist_id )
 
       put( endpoint, payload.to_json )
-
     end
-
 
     ### Delete a playlist
     #
@@ -466,7 +458,6 @@ module Grafana
     #```
 
     def delete_playlist(playlist_id, multi_result = false )
-
       raise ArgumentError.new(format("wrong type. 'playlist_id' must be an String (for an Playlist name) or an Integer (for an Playlist Id), given '%s'", playlist_id.class.to_s)) if  playlist_id.is_a?(String) && playlist_id.is_a?(Integer) 
       raise ArgumentError.new("missing 'playlist_id'") if( playlist_id.empty? )
 
@@ -525,10 +516,8 @@ module Grafana
       result
     end
 
-
     private
     def create_playlist_items( items, playlist_id = nil)
-
       playlist_items   = []
 
       items.each do |r|

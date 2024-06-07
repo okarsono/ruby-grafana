@@ -40,6 +40,15 @@ Layout/LineLength:
   Max: 250
   Enabled: true
 
+Layout/EmptyLines:
+  Enabled: true
+
+Layout/EmptyLineAfterGuardClause:
+  Enabled: true
+
+Layout/EmptyLinesAroundMethodBody:
+  Enabled: true
+
 CyclomaticComplexity:
   Enabled: false
 

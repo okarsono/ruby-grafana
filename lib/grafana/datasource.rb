@@ -14,7 +14,6 @@ module Grafana
     # @return [Hash]
     #
     def datasources
-
       endpoint = "/api/datasources"
 
       @logger.debug("Attempting to get all existing data sources (GET #{endpoint})") if @debug
@@ -44,7 +43,6 @@ module Grafana
     # @return [Hash]
     #
     def datasource( datasource_id )
-
       if( datasource_id.is_a?(String) && datasource_id.is_a?(Integer) )
         raise ArgumentError.new(format("wrong type. 'datasource_id' must be an String (for an Datasource name) or an Integer (for an Datasource Id), given '%s'", datasource_id.class.to_s))
       end
@@ -104,7 +102,6 @@ module Grafana
     # @return [Hash]
     #
     def update_datasource( params )
-
       raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
       raise ArgumentError.new("missing 'params'") if( params.empty? )
 
@@ -126,6 +123,7 @@ module Grafana
       org_id       = nil
 
       raise ArgumentError.new(format("wrong type. 'name' must be an String (for an Datasource name) or an Integer (for an Datasource Id), given '%s'", name.class.to_s)) if  name.is_a?(String) && name.is_a?(Integer) 
+
       if( organisation )
         if( organisation.is_a?(String) && organisation.is_a?(Integer) )
           raise ArgumentError.new(format("wrong type. 'organisation' must be an String (for an Organisation name) or an Integer (for an Organisation Id), given '%s'", organisation.class.to_s))
@@ -228,7 +226,6 @@ module Grafana
     # @return [Hash]
     #
     def create_datasource( params )
-
       raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
       raise ArgumentError.new("missing 'params'") if( params.empty? )
 
@@ -278,7 +275,6 @@ module Grafana
     # @return [Hash]
     #
     def delete_datasource( datasource_id )
-
       if( datasource_id.is_a?(String) && datasource_id.is_a?(Integer) )
         raise ArgumentError.new(format("wrong type. 'datasource_id' must be an String (for an Datasource name) or an Integer (for an Datasource Id), given '%s'", datasource_id.class.to_s))
       end
@@ -299,14 +295,11 @@ module Grafana
       delete(endpoint)
     end
 
-
     # Delete an existing data source by name
     # DELETE /api/datasources/name/:datasourceName
 
     # Data source proxy calls
     # GET /api/datasources/proxy/:datasourceId/*
-
-
 
   end
 

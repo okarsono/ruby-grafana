@@ -16,7 +16,6 @@ module Grafana
     #
     #
     def dashboard_all_versions( params )
-
       raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
       raise ArgumentError.new("missing 'params'") if( params.empty? )
 
@@ -40,7 +39,6 @@ module Grafana
     # http://docs.grafana.org/http_api/dashboard_versions/#get-dashboard-version
     # GET /api/dashboards/id/:dashboardId/versions/:id
     def dashboard_version( params )
-
       raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
       raise ArgumentError.new("missing 'params'") if( params.empty? )
 
@@ -63,7 +61,6 @@ module Grafana
     # http://docs.grafana.org/http_api/dashboard_versions/#restore-dashboard
     # POST /api/dashboards/id/:dashboardId/restore
     def restore_dashboard( params )
-
       raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
       raise ArgumentError.new("missing 'params'") if( params.empty? )
 
@@ -86,7 +83,6 @@ module Grafana
     # http://docs.grafana.org/http_api/dashboard_versions/#compare-dashboard-versions
     # POST /api/dashboards/calculate-diff
     def compare_dashboard_version( params )
-
       raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
       raise ArgumentError.new("missing 'params'") if( params.empty? )
 

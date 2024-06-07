@@ -1,4 +1,5 @@
 # coding: utf-8
+# frozen_string_literal: true
 lib = File.expand_path("lib", __dir__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require "grafana/version"
@@ -43,22 +44,9 @@ Gem::Specification.new do |spec|
   spec.add_dependency("rest-client", "~> 2.0")
 
   begin
-    if( RUBY_VERSION >= "3.0" )
-      spec.required_ruby_version = "~> 3.0"
-    elsif( RUBY_VERSION >= "2.0" )
-      spec.required_ruby_version = "~> 2.0"
-    elsif( RUBY_VERSION <= "2.1" )
-      spec.required_ruby_version = "~> 2.1"
-    elsif( RUBY_VERSION <= "2.2" )
-      spec.required_ruby_version = "~> 2.2"
-    elsif( RUBY_VERSION <= "2.3" )
-      spec.required_ruby_version = "~> 2.3"
-    end
-
-    spec.add_dependency("ruby_dig", "~> 0") if( RUBY_VERSION < "2.3" )
-
+    spec.required_ruby_version = ">= 2.7.0"
   rescue => e
-    warn "#{$0}: #{e}"
+    warn "#{$PROGRAM_NAME}: #{e}"
     exit!
   end
 

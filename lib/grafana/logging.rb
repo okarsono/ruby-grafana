@@ -20,7 +20,6 @@ module Logging
     end
 
     def configure_logger_for( _classname )
-
       log_level = ENV.fetch("LOG_LEVEL", "INFO" )
       level = log_level.dup
 

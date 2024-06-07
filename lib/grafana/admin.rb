@@ -56,13 +56,13 @@ module Grafana
     # @return [Hash]
     #
     def update_user_permissions( params )
-
       raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
       raise ArgumentError.new("missing params") if( params.empty? )
 
       user_name   = validate( params, required: true, var: "user_name", type: String )
       permissions = validate( params, required: true, var: "permissions" )
       raise ArgumentError.new(format("wrong type. 'permissions' must be an String or Hash, given %s", permissions.class.to_s ) ) unless( permissions.is_a?(String) || permissions.is_a?(Hash) )
+
       valid_roles    = ["Viewer", "Editor", "Read Only Editor", "Admin"]
 
       downcased = Set.new valid_roles.map(&:downcase)
@@ -140,7 +140,6 @@ module Grafana
     # @return [Hash]
     #
     def delete_user( user_id )
-
       raise ArgumentError.new(format("wrong type. user 'user_id' must be an String (for an User name) or an Integer (for an User Id), given '%s'", user_id.class.to_s))  \
         if( user_id.is_a?(String) && user_id.is_a?(Integer) )
       raise ArgumentError.new("missing 'user_id'") if( user_id.empty? )
@@ -180,7 +179,6 @@ module Grafana
     # @return [Hash|FalseClass]
     #
     def add_user( params )
-
       raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
       raise ArgumentError.new("missing params") if( params.empty? )
 
@@ -237,7 +235,6 @@ module Grafana
     # @return [Hash]
     #
     def update_user_password( params )
-
       raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
       raise ArgumentError.new("missing params") if( params.empty? )
 
@@ -271,7 +268,6 @@ module Grafana
     # @return [Hash]
     #
     def pause_all_alerts
-
       endpoint = "/api/admin/pause-all-alerts"
       logger.debug("pause all alerts (POST #{endpoint})") if @debug
 

@@ -39,7 +39,6 @@ module Grafana
     # @return [String]
     #
     def dashboard( name )
-
       raise ArgumentError.new(format("wrong type. 'name' must be an String, given '%s'", name.class.to_s)) unless( name.is_a?(String) )
       raise ArgumentError.new("missing name") if( name.empty? )
 
@@ -72,7 +71,6 @@ module Grafana
     # @return [String]
     #
     def dashboard_by_uid( uid )
-
       raise ArgumentError.new(format("wrong type. dashboard 'uid' must be an String (for an title name) or an Integer (for an Datasource Id), given '%s'", uid.class.to_s)) if  uid.is_a?(String) && uid.is_a?(Integer) 
       raise ArgumentError.new("missing 'uid'") if( uid.empty? )
 
@@ -125,7 +123,6 @@ module Grafana
     #
     # POST /api/dashboards/db
     def create_dashboard( params )
-
       raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
       raise ArgumentError.new("missing 'params'") if( params.empty? )
 
@@ -177,7 +174,6 @@ module Grafana
     # @return [Hash]
     #
     def delete_dashboard( name )
-
       raise ArgumentError.new(format("wrong type. 'name' must be an String, given '%s'", name.class.to_s)) unless( name.is_a?(String) )
       raise ArgumentError.new("missing name") if( name.empty? )
 
@@ -196,7 +192,6 @@ module Grafana
     # @return [Hash]
     #
     def home_dashboard
-
       endpoint = "/api/dashboards/home"
 
       @logger.debug("Attempting to get home dashboard (GET #{endpoint})") if @debug
@@ -212,7 +207,6 @@ module Grafana
     # @return [Hash]
     #
     def dashboard_tags
-
       endpoint = "/api/dashboards/tags"
 
       @logger.debug("Attempting to get dashboard tags(GET #{endpoint})") if @debug
@@ -232,7 +226,6 @@ module Grafana
     # @return [Hash]
     #
     def search_dashboards( params )
-
       raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
 
       query   = validate( params, required: false, var: "query", type: String )
@@ -265,7 +258,6 @@ module Grafana
     # @return [Hash]
     #
     def import_dashboards_from_directory( directory )
-
       raise ArgumentError.new("directory must be an String") unless( directory.is_a?(String) )
 
       result = {}

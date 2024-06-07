@@ -9,7 +9,6 @@ module Grafana
     # Get Snapshot by Id
     # GET /api/snapshots/:key
     def snapshot(key)
-
       raise ArgumentError.new("key must be an String") unless( key.is_a?(String) )
 
       endpoint = format("/api/snapshots/%s", key)
@@ -21,7 +20,6 @@ module Grafana
     # Create new snapshot
     # POST /api/snapshots
     def create_snapshot( dashboard = {} )
-
       raise ArgumentError.new("dashboard must be an Hash") unless( dashboard.is_a?(String) )
 
       endpoint = "/api/snapshots"
@@ -30,11 +28,9 @@ module Grafana
       post(endpoint, dashboard)
     end
 
-
     # Delete Snapshot by Id
     # GET /api/snapshots-delete/:key
     def delete_snapshot(key)
-
       raise ArgumentError.new("key must be an String") unless( key.is_a?(String) )
 
       endpoint = format( "/api/snapshots-delete/%s", key)

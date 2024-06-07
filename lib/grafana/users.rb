@@ -30,7 +30,6 @@ module Grafana
     # @return [Hash]
     #
     def user( user_id )
-
       raise ArgumentError.new(format("wrong type. user 'user_id' must be an String (for an User name) or an Integer (for an User Id), given '%s'", user_id.class.to_s)) if  user_id.is_a?(String) && user_id.is_a?(Integer) 
       raise ArgumentError.new("missing 'user_id'") if( user_id.empty? )
 
@@ -67,7 +66,6 @@ module Grafana
     # @return [Array of Hashes] or false
     #
     def search_for_users_by( params )
-
       raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
       raise ArgumentError.new("missing 'params'") if( params.empty? )
 
@@ -104,7 +102,6 @@ module Grafana
     #
     # PUT /api/users/:id
     def update_user( params )
-
       raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
 
       user_name  = validate( params, required: true , var: "user_name" , type: String )
@@ -148,7 +145,6 @@ module Grafana
     # @return [Hash]
     #
     def user_organizations( user_id )
-
       raise ArgumentError.new(format("wrong type. user 'user_id' must be an String (for an Username) or an Integer (for an Userid), given '%s'", user_id.class.to_s)) if  user_id.is_a?(String) && user_id.is_a?(Integer) 
       raise ArgumentError.new("missing 'user_id'") if( user_id.empty? )
 

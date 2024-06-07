@@ -105,7 +105,6 @@ module Grafana
     #
     #
     def initialize( settings )
-
       raise ArgumentError.new("only Hash are allowed") unless( settings.is_a?(Hash) )
       raise ArgumentError.new("missing settings") if( settings.empty? )
 
@@ -140,9 +139,7 @@ module Grafana
       @url      = format( "%s://%s:%d%s", protocoll, host, port, url_path )
     end
 
-
     def create_instance
-
       logger.debug( "create_instance" )
       logger.debug( "@api_key: #{@api_key} #{@api_key.class}" )
 
@@ -161,7 +158,6 @@ module Grafana
       end
     end
 
-
     # Get Settings
     #
     # http://docs.grafana.org/http_api/other/#get-settings
@@ -171,7 +167,6 @@ module Grafana
       @logger.debug("Getting all settings (GET #{endpoint})") if @debug
       get(endpoint)
     end
-
 
     def version
       s = settings
@@ -186,7 +181,6 @@ module Grafana
         s
       end
     end
-
 
 #    def self.logger
 #      @@logger ||= defined?(Logging) ? Logging.logger : Logger.new(STDOUT)

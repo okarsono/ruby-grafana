@@ -24,7 +24,6 @@ module Grafana
     # Gets all existing permissions for the dashboard with the given dashboardId.
     #
     def dashboard_permissions(uid)
-
       raise ArgumentError.new(format("wrong type. dashboard 'uid' must be an String (for an title name) or an Integer (for an Datasource Id), given '%s'", uid.class.to_s)) if  uid.is_a?(String) && uid.is_a?(Integer) 
       raise ArgumentError.new("missing 'uid'") if( uid.empty? )
 
@@ -45,7 +44,6 @@ module Grafana
     #
     #
     def update_dashboad_permissions(params)
-
       raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
       raise ArgumentError.new("missing 'params'") if( params.empty? )
 
@@ -120,7 +118,6 @@ module Grafana
         items: team + user
       }
       payload.reject!{ |_, y| y.nil? }
-
 
       endpoint = format("/api/dashboards/id/%s/permissions", dashboard_id)
       post(endpoint, payload.to_json)

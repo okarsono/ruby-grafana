@@ -38,7 +38,6 @@ module Grafana
     # @return [Array]
     #
     def find_annotation( params )
-
       raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
       raise ArgumentError.new("missing 'params'") if( params.empty? )
 
@@ -116,7 +115,6 @@ module Grafana
     # @return [Hash]
     #
     def create_annotation( params )
-
       raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
       raise ArgumentError.new("missing 'params'") if( params.empty? )
 
@@ -185,7 +183,6 @@ module Grafana
     # @return [Hash]
     #
     def create_annotation_graphite( params )
-
       raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
       raise ArgumentError.new("missing 'params'") if( params.empty? )
 
@@ -229,7 +226,6 @@ module Grafana
     # @return [Hash]
     #
     def update_annotation( params )
-
       raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
       raise ArgumentError.new("missing 'params'") if( params.empty? )
 
@@ -270,7 +266,6 @@ module Grafana
     # @return [Hash]
     #
     def delete_annotation( annotation_id )
-
       raise ArgumentError.new(format("wrong type. user 'annotation_id' must be an Integer, given '%s'", annotation_id.class.to_s)) unless( annotation_id.is_a?(Integer) )
       raise ArgumentError.new("missing 'annotation_id'") if( annotation_id.empty? )
       raise ArgumentError.new("'annotation_id' can not be 0") if( annotation_id.zero? )
@@ -297,9 +292,9 @@ module Grafana
     # @return [Hash]
     #
     def delete_annotation_by_region( region_id )
-
       raise ArgumentError.new(format("wrong type. user 'region_id' must be an Integer, given '%s'", region_id.class.to_s)) unless( region_id.is_a?(Integer) )
       raise ArgumentError.new("missing 'region_id'") if( region_id.empty? )
+
 #       raise ArgumentError.new('\'region_id\' can not be 0') if( region_id.zero? )
 
       endpoint = format( "/api/annotation/region/%d", region_id )

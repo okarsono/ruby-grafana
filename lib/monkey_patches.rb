@@ -15,7 +15,6 @@
 class Object
 
   def deep_symbolize_keys
-
     if( is_a?( Hash ) )
       return inject({}) do |memo, (k, v)|
         memo.tap { |m| m[k.to_sym] = v.deep_string_keys }
@@ -28,7 +27,6 @@ class Object
   end
 
   def deep_string_keys
-
     if( is_a?( Hash ) )
       return inject({}) do |memo, (k, v)|
         memo.tap { |m| m[k.to_s] = v.deep_string_keys }

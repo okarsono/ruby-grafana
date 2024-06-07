@@ -13,7 +13,6 @@ module Grafana
     # Get Current User Prefs
     # GET /api/user/preferences
     def user_preferences
-
       v, mv = version.values
       return { "status" => 404, "message" => format( "folder has been supported in Grafana since version 5. you use version %s", v) } if(mv < 5)
 
@@ -21,7 +20,6 @@ module Grafana
       @logger.debug("Getting current user preferences (GET #{endpoint})") if @debug
       get(endpoint)
     end
-
 
     # Update Current User Prefs
     # PUT /api/user/preferences
@@ -31,7 +29,6 @@ module Grafana
     # timezone - One of: utc, browser, or an empty string for the default
     #
     def update_user_preferences(params)
-
       raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
       raise ArgumentError.new("missing 'params'") if( params.empty? )
 
@@ -41,11 +38,9 @@ module Grafana
       update_preferences( endpoint, params )
     end
 
-
     # Get Current Org Prefs
     # GET /api/org/preferences
     def org_preferences
-
       v, mv = version.values
       return { "status" => 404, "message" => format( "folder has been supported in Grafana since version 5. you use version %s", v) } if(mv < 5)
 
@@ -53,8 +48,6 @@ module Grafana
       @logger.debug("Getting current organisation preferences (GET #{endpoint})") if @debug
       get(endpoint)
     end
-
-
 
     # Update Current Org Prefs
     # PUT /api/org/preferences
@@ -64,7 +57,6 @@ module Grafana
     # timezone - One of: utc, browser, or an empty string for the default
     #
     def update_org_preferences(params)
-
       raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
       raise ArgumentError.new("missing 'params'") if( params.empty? )
 
@@ -74,10 +66,8 @@ module Grafana
       update_preferences( endpoint, params )
     end
 
-
     private
     def update_preferences( endpoint, params )
-
       theme          = validate( params, required: false, var: "theme"         , type: String )
       timezone       = validate( params, required: false, var: "timezone"      , type: String )
       home_dashboard = validate( params, required: false, var: "home_dashboard")

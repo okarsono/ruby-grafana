@@ -28,8 +28,8 @@ module Grafana
     # curl -H 'Content-Type: application/json;charset=UTF-8' 'http://admin:admin@127.0.0.1:3030/api/alerts'
     #
     def alerts( params )
-
       raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
+
 #       raise ArgumentError.new('missing \'params\'') if( params.size.zero? )
 
       dashboard_id = validate( params, required: false, var: "dashboard_id" )
@@ -89,7 +89,6 @@ module Grafana
     # curl -H 'Content-Type: application/json;charset=UTF-8' 'http://admin:admin@127.0.0.1:3030/api/alerts/1'
     #
     def alert( alert_id )
-
       raise ArgumentError.new(format("wrong type. 'alert_id' must be an String (for an Alert name) or an Integer (for an Alert Id), given '%s'", alert_id.class.to_s)) if  alert_id.is_a?(String) && alert_id.is_a?(Integer) 
       raise ArgumentError.new("missing 'alert_id'") if( alert_id.empty? )
 
@@ -110,7 +109,6 @@ module Grafana
       get( endpoint )
     end
 
-
     # Pause single alert
     #
     # @param [Mixed] alert_id Alertname (String) or Alertid (Integer)
@@ -122,7 +120,6 @@ module Grafana
     # @return [Hash]
     #
     def alert_pause( alert_id )
-
       raise ArgumentError.new(format("wrong type. 'alert_id' must be an String (for an Alert name) or an Integer (for an Alert Id), given '%s'", alert_id.class.to_s)) if  alert_id.is_a?(String) && alert_id.is_a?(Integer) 
       raise ArgumentError.new("missing 'alert_id'") if( alert_id.empty? )
 
@@ -152,11 +149,6 @@ module Grafana
       get("/api/alert-notifications")
     end
 
-
-
-
-
-
     # Create alert notification
     #
     # @param [Hash] params
@@ -180,7 +172,6 @@ module Grafana
     # @return [Hash]
     #
     def create_alert_notification( params )
-
       raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
       raise ArgumentError.new("missing params") if( params.empty? )
 
@@ -257,7 +248,6 @@ module Grafana
     # @return [Hash]
     #
     def update_alert_notification( params )
-
       raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
       raise ArgumentError.new("missing params") if( params.empty? )
 
@@ -305,7 +295,6 @@ module Grafana
     # @return [Hash]
     #
     def delete_alert_notification( alert_id )
-
       raise ArgumentError.new(format("wrong type. user 'alert_id' must be an String (for an Alert name) or an Integer (for an Alert Id), given '%s'", alert_id.class.to_s)) if  alert_id.is_a?(String) && alert_id.is_a?(Integer) 
       raise ArgumentError.new("missing 'alert_id'") if( alert_id.empty? )
 
@@ -318,10 +307,8 @@ module Grafana
       delete( endpoint )
     end
 
-
     private
     def alert_notification?( alert_id )
-
       id = alert_notification_id(alert_id)
 
       return true unless( id.nil? )
@@ -330,7 +317,6 @@ module Grafana
     end
 
     def alert_notification_id( alert_id )
-
       data = alert_notifications
       data = data["message"] unless( data.nil? && data["status"].to_i == 200 )
 

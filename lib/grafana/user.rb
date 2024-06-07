@@ -31,7 +31,6 @@ module Grafana
     # @return [Hash]
     #
     def update_current_user_password( params )
-
       raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
       raise ArgumentError.new("missing 'params'") if( params.empty? )
 
@@ -58,7 +57,6 @@ module Grafana
     # @return [Hash]
     #
     def switch_current_user_organization( organization )
-
       raise ArgumentError.new(format("wrong type. 'organization' must be an String, given '%s'", organization.class.to_s)) unless( organization.is_a?(String) )
       raise ArgumentError.new("missing 'organization'") if( organization.empty? )
 
@@ -98,7 +96,6 @@ module Grafana
     # @return [Hash]
     #
     def add_dashboard_star( dashboard_id )
-
       raise ArgumentError.new(format("wrong type. 'dashboard_id' must be an String (for an Dashboard name) or an Integer (for an Dashboard Id), given '%s'", dashboard_id.class.to_s)) if  dashboard_id.is_a?(String) && dashboard_id.is_a?(Integer) 
       raise ArgumentError.new("missing 'dashboard_id'") if( dashboard_id.empty? )
 
@@ -128,7 +125,6 @@ module Grafana
     # @return [Hash]
     #
     def remove_dashboard_star( dashboard_id )
-
       raise ArgumentError.new(format("wrong type. 'dashboard_id' must be an String (for an Dashboard name) or an Integer (for an Dashboard Id), given '%s'", dashboard_id.class.to_s)) if  dashboard_id.is_a?(String) && dashboard_id.is_a?(Integer) 
       raise ArgumentError.new("missing 'dashboard_id'") if( dashboard_id.empty? )
 
