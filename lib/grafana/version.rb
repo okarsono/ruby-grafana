@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Grafana
 
   # namespace for version information
@@ -12,6 +13,6 @@ module Grafana
   end
 
   # Current version of gem.
-  VERSION = [Version::MAJOR, Version::MINOR, Version::TINY].compact * '.'
+  VERSION = [Version::MAJOR, Version::MINOR, Version::TINY].compact * "."
 
 end

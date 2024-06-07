@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Grafana
 
   module Tags
@@ -24,24 +25,24 @@ module Grafana
     #
     def expand_tags( params )
 
-      raise ArgumentError.new(format('wrong type. \'params\' must be an Hash, given \'%s\'', params.class.to_s)) unless( params.is_a?(Hash) )
-      raise ArgumentError.new('missing \'params\'') if( params.size.zero? )
+      raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
+      raise ArgumentError.new("missing 'params'") if( params.empty? )
 
-      dashboard       = validate( params, required: true, var: 'dashboard', type: Hash )
-      additional_tags = validate( params, required: true, var: 'additional_tags', type: Array )
+      dashboard       = validate( params, required: true, var: "dashboard", type: Hash )
+      additional_tags = validate( params, required: true, var: "additional_tags", type: Array )
 
       # add tags
       # dashboard = JSON.parse( dashboard ) if( dashboard.is_a?( String ) )
 
       additional_tags = additional_tags.values if( additional_tags.is_a?( Hash ) )
 
-      current_tags = dashboard.dig( 'dashboard', 'tags' )
+      current_tags = dashboard.dig( "dashboard", "tags" )
 
-      if( !current_tags.nil? && additional_tags.count > 0 )
+      if( !current_tags.nil? && additional_tags.count.positive? )
         current_tags << additional_tags
         current_tags.flatten!
         current_tags.sort!
-        dashboard['dashboard']['tags'] = current_tags
+        dashboard["dashboard"]["tags"] = current_tags
       end
 
       JSON.generate( dashboard ) if( dashboard.is_a?( Hash ) )

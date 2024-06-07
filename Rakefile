@@ -1,29 +1,28 @@
 
-require 'bundler/gem_tasks'
-require 'rspec/core/rake_task'
-require 'bundler/gem_tasks'
-require 'rubocop/rake_task'
-require 'rake/testtask'
+require "bundler/gem_tasks"
+require "rspec/core/rake_task"
+require "rubocop/rake_task"
+require "rake/testtask"
 
 # Default directory to look in is `/specs`
 # Run with `rake spec`
 RSpec::Core::RakeTask.new(:spec) do |task|
-  task.rspec_opts = ['--color']
+  task.rspec_opts = ["--color"]
 end
 
-desc 'Run all style checks'
-task :style => ['style:ruby']
+desc "Run all style checks"
+task style: ["style:ruby"]
 
-desc 'Run all regular tasks'
-task :default => :spec
+desc "Run all regular tasks"
+task default: :spec
 
-desc 'Run all tests'
-task :test => ['test']
+desc "Run all tests"
+task test: ["test"]
 
 namespace :style do
-  desc 'Run Ruby style checks'
+  desc "Run Ruby style checks"
   RuboCop::RakeTask.new(:ruby) do |task|
-    task.patterns = ['lib/*.rb', 'lib/**/*.rb']
+    task.patterns = ["lib/*.rb", "lib/**/*.rb"]
     # don't abort rake on failure
     task.fail_on_error = true
   end
@@ -31,7 +30,7 @@ end
 
 
 Rake::TestTask.new("test:all") do |t|
-  t.libs = ['lib']
+  t.libs = ["lib"]
   t.warning = true
-  t.test_files = FileList['spec/**/*_spec.rb']
+  t.test_files = FileList["spec/**/*_spec.rb"]
 end

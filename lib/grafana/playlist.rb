@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 
 module Grafana
 
@@ -54,13 +55,13 @@ module Grafana
     #```
     def playlists
 
-      endpoint = '/api/playlists'
+      endpoint = "/api/playlists"
 
       @logger.debug("Attempting to get all existing playlists (GET #{endpoint})") if @debug
 
       playlists = get( endpoint )
 
-      return { 'status' => 404, 'message' => 'No Playlists found' } if( playlists.nil? || playlists == false || playlists.dig('status').to_i != 200 )
+      return { "status" => 404, "message" => "No Playlists found" } if( playlists.nil? || playlists == false || playlists["status"].to_i != 200 )
 
       playlists
     end
@@ -110,39 +111,37 @@ module Grafana
 
     def playlist( playlist_id )
 
-      if( playlist_id.is_a?(String) && playlist_id.is_a?(Integer) )
-        raise ArgumentError.new(format('wrong type. \'playlist_id\' must be an String (for an Playlist name) or an Integer (for an Playlist Id), given \'%s\'', playlist_id.class.to_s))
-      end
-      raise ArgumentError.new('missing \'playlist_id\'') if( playlist_id.size.zero? )
+      raise ArgumentError.new(format("wrong type. 'playlist_id' must be an String (for an Playlist name) or an Integer (for an Playlist Id), given '%s'", playlist_id.class.to_s)) if  playlist_id.is_a?(String) && playlist_id.is_a?(Integer) 
+      raise ArgumentError.new("missing 'playlist_id'") if( playlist_id.empty? )
 
       if(playlist_id.is_a?(String))
 
         data = playlists
-        status = data.dig('status')
-        d = data.dig('message')
-        data = d.select { |k| k['name'] == playlist_id }
+        status = data["status"]
+        d = data["message"]
+        data = d.select { |k| k["name"] == playlist_id }
 
-        return { 'status' => 404, 'message' => format( 'No Playlist \'%s\' found', playlist_id) } if( data.size.zero? )
+        return { "status" => 404, "message" => format( "No Playlist '%s' found", playlist_id) } if( data.empty? )
 
         unless( data.empty? )
           playlist_data = []
           data.each_entry do |k|
-            playlist_data << playlist( k['id'] )
+            playlist_data << playlist( k["id"] )
           end
 
-          return { 'status' => status, 'playlists' => playlist_data }
+          return { "status" => status, "playlists" => playlist_data }
         end
       end
 
-      raise format('playlist id can not be 0') if( playlist_id.zero? )
+      raise format("playlist id can not be 0") if( playlist_id.zero? )
 
-      endpoint = format('/api/playlists/%d', playlist_id )
+      endpoint = format("/api/playlists/%d", playlist_id )
 
       @logger.debug("Attempting to get existing playlist id #{playlist_id} (GET #{endpoint})") if  @debug
 
       result = get(endpoint)
 
-      return { 'status' => 404, 'message' => 'playlist is empty', 'items' => [] } if( result.dig('status') == 404 )
+      return { "status" => 404, "message" => "playlist is empty", "items" => [] } if( result["status"] == 404 )
 
       result
     end
@@ -186,36 +185,34 @@ module Grafana
 
     def playlist_items( playlist_id, multi_result = false )
 
-      if( playlist_id.is_a?(String) && playlist_id.is_a?(Integer) )
-        raise ArgumentError.new(format('wrong type. \'playlist_id\' must be an String (for an playlist name) or an Integer (for an playlist Id), given \'%s\'', playlist_id.class.to_s))
-      end
-      raise ArgumentError.new('missing \'playlist_id\'') if( playlist_id.size.zero? )
+      raise ArgumentError.new(format("wrong type. 'playlist_id' must be an String (for an playlist name) or an Integer (for an playlist Id), given '%s'", playlist_id.class.to_s)) if  playlist_id.is_a?(String) && playlist_id.is_a?(Integer) 
+      raise ArgumentError.new("missing 'playlist_id'") if( playlist_id.empty? )
 
       tmp_playlists = playlists
 
       begin
-        status  = tmp_playlists.dig('status').to_i
-        message = tmp_playlists.dig('message')
+        status  = tmp_playlists["status"].to_i
+        message = tmp_playlists["message"]
 
         return tmp_playlists if( status != 200 )
 
-        data = message.select { |k| k['id'] == playlist_id } if( playlist_id.is_a?(Integer) )
-        data = message.select { |k| k['name'] == playlist_id } if( playlist_id.is_a?(String) )
+        data = message.select { |k| k["id"] == playlist_id } if( playlist_id.is_a?(Integer) )
+        data = message.select { |k| k["name"] == playlist_id } if( playlist_id.is_a?(String) )
 
-        return { 'status' => 404, 'message' => 'No Playlist found' } if( !data.is_a?(Array) || data.count.zero? || status.to_i != 200 )
-        return { 'status' => 404, 'message' => format('found %d playlists with name %s', data.count, playlist_id ) } if( data.count > 1 && multi_result == false )
+        return { "status" => 404, "message" => "No Playlist found" } if( !data.is_a?(Array) || data.count.zero? || status.to_i != 200 )
+        return { "status" => 404, "message" => format("found %d playlists with name %s", data.count, playlist_id ) } if( data.count > 1 && multi_result == false )
 
-        id = data.first.dig('id')
+        id = data.first["id"]
 
       rescue
-        return { 'status' => 404, 'message' => 'No Playlists found' } if( playlists.nil? || playlists == false || playlists.dig('status').to_i != 200 )
+        return { "status" => 404, "message" => "No Playlists found" } if( playlists.nil? || playlists == false || playlists["status"].to_i != 200 )
       end
 
       endpoint = "/api/playlists/#{id}/items"
 
       result = get( endpoint )
 
-      return { 'status' => 404, 'message' => 'playlist is empty' } if( result.dig('status') == 404 )
+      return { "status" => 404, "message" => "playlist is empty" } if( result["status"] == 404 )
 
       result
     end
@@ -254,10 +251,10 @@ module Grafana
 
     def playlist_dashboards( playlist_id )
 
-      raise ArgumentError.new(format('wrong type. \'playlist_id\' must be an Integer, given \'%s\'', playlist_id.class)) unless( playlist_id.is_a?(Integer) )
-      raise ArgumentError.new('missing \'playlist_id\'') if( playlist_id.size.zero? )
+      raise ArgumentError.new(format("wrong type. 'playlist_id' must be an Integer, given '%s'", playlist_id.class)) unless( playlist_id.is_a?(Integer) )
+      raise ArgumentError.new("missing 'playlist_id'") if( playlist_id.empty? )
 
-      endpoint = format('/api/playlists/%s/dashboards', playlist_id)
+      endpoint = format("/api/playlists/%s/dashboards", playlist_id)
 
       @logger.debug( "Attempting to get playlist (GET #{endpoint})" ) if @debug
       get(endpoint)
@@ -308,17 +305,17 @@ module Grafana
 
     def create_playlist( params )
 
-      raise ArgumentError.new(format('wrong type. \'params\' must be an Hash, given \'%s\'', params.class.to_s)) unless( params.is_a?(Hash) )
-      raise ArgumentError.new('missing \'params\'') if( params.size.zero? )
+      raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
+      raise ArgumentError.new("missing 'params'") if( params.empty? )
 
 #      v, mv = version.values
 #      return { 'status' => 404, 'message' => format( 'folder has been supported in Grafana since version 5. you use version %s', v) } if(mv < 5)
 
-      name     = validate( params, required: true , var: 'name'      , type: String )
-      interval = validate( params, required: true , var: 'interval'  , type: String )
-      items    = validate( params, required: true , var: 'items'     , type: Array )
+      name     = validate( params, required: true , var: "name"      , type: String )
+      interval = validate( params, required: true , var: "interval"  , type: String )
+      items    = validate( params, required: true , var: "items"     , type: Array )
 
-      return { 'status' => 404, 'message' => 'There are no elements for a playlist' } if(items.count.zero?)
+      return { "status" => 404, "message" => "There are no elements for a playlist" } if(items.count.zero?)
 
       payload_items = create_playlist_items(items)
 
@@ -329,7 +326,7 @@ module Grafana
       }
       payload.reject!{ |_k, v| v.nil? }
 
-      endpoint = '/api/playlists'
+      endpoint = "/api/playlists"
 
       post(endpoint, payload.to_json)
     end
@@ -400,36 +397,36 @@ module Grafana
 
     def update_playlist( params )
 
-      raise ArgumentError.new(format('wrong type. \'params\' must be an Hash, given \'%s\'', params.class.to_s)) unless( params.is_a?(Hash) )
-      raise ArgumentError.new('missing \'params\'') if( params.size.zero? )
+      raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
+      raise ArgumentError.new("missing 'params'") if( params.empty? )
 
-      playlist_id   = validate( params, required: true , var: 'playlist' )
-      name          = validate( params, required: false, var: 'name' )
-      interval      = validate( params, required: false, var: 'interval', type: String )
+      playlist_id   = validate( params, required: true , var: "playlist" )
+      name          = validate( params, required: false, var: "name" )
+      interval      = validate( params, required: false, var: "interval", type: String )
       # organisation = validate( params, required: false, var: 'organisation' )
-      items         = validate( params, required: false, var: 'items', type: Array )
+      items         = validate( params, required: false, var: "items", type: Array )
 
       tmp_playlists    = playlists
 
       data = []
 
       begin
-        status  = tmp_playlists.dig('status').to_i
-        message = tmp_playlists.dig('message')
+        status  = tmp_playlists["status"].to_i
+        message = tmp_playlists["message"]
 
         return tmp_playlists if( status != 200 )
 
-        data = message.select { |k| k['id'] == playlist_id } if( playlist_id.is_a?(Integer) )
-        data = message.select { |k| k['name'] == playlist_id } if( playlist_id.is_a?(String) )
+        data = message.select { |k| k["id"] == playlist_id } if( playlist_id.is_a?(Integer) )
+        data = message.select { |k| k["name"] == playlist_id } if( playlist_id.is_a?(String) )
 
-        return { 'status' => 404, 'message' => 'no playlist found' } if( !data.is_a?(Array) || data.count.zero? || status.to_i != 200 )
-        return { 'status' => 404, 'message' => format('found %d playlists with name %s', data.count, playlist_id ) } if( data.count > 1 && multi_result == false )
+        return { "status" => 404, "message" => "no playlist found" } if( !data.is_a?(Array) || data.count.zero? || status.to_i != 200 )
+        return { "status" => 404, "message" => format("found %d playlists with name %s", data.count, playlist_id ) } if( data.count > 1 && multi_result == false )
 
       rescue
-        return { 'status' => 404, 'message' => 'no playlists found' } if( playlists.nil? || playlists == false || playlists.dig('status').to_i != 200 )
+        return { "status" => 404, "message" => "no playlists found" } if( playlists.nil? || playlists == false || playlists["status"].to_i != 200 )
       end
 
-      playlist_id   = data.first.dig('id')
+      playlist_id   = data.first["id"]
       # playlist_name = data.first.dig('name')
       payload_items = create_playlist_items(items, playlist_id)
 
@@ -441,7 +438,7 @@ module Grafana
       }
       payload.reject!{ |_k, v| v.nil? }
 
-      endpoint = format( '/api/playlists/%d', playlist_id )
+      endpoint = format( "/api/playlists/%d", playlist_id )
 
       put( endpoint, payload.to_json )
 
@@ -470,58 +467,56 @@ module Grafana
 
     def delete_playlist(playlist_id, multi_result = false )
 
-      if( playlist_id.is_a?(String) && playlist_id.is_a?(Integer) )
-        raise ArgumentError.new(format('wrong type. \'playlist_id\' must be an String (for an Playlist name) or an Integer (for an Playlist Id), given \'%s\'', playlist_id.class.to_s))
-      end
-      raise ArgumentError.new('missing \'playlist_id\'') if( playlist_id.size.zero? )
+      raise ArgumentError.new(format("wrong type. 'playlist_id' must be an String (for an Playlist name) or an Integer (for an Playlist Id), given '%s'", playlist_id.class.to_s)) if  playlist_id.is_a?(String) && playlist_id.is_a?(Integer) 
+      raise ArgumentError.new("missing 'playlist_id'") if( playlist_id.empty? )
 
       tmp_playlists = playlists
 
       data = []
 
       begin
-        status  = tmp_playlists.dig('status').to_i
-        message = tmp_playlists.dig('message')
+        status  = tmp_playlists["status"].to_i
+        message = tmp_playlists["message"]
 
         return tmp_playlists if( status != 200 )
 
-        data = message.select { |k| k['id'] == playlist_id } if( playlist_id.is_a?(Integer) )
-        data = message.select { |k| k['name'] == playlist_id } if( playlist_id.is_a?(String) )
+        data = message.select { |k| k["id"] == playlist_id } if( playlist_id.is_a?(Integer) )
+        data = message.select { |k| k["name"] == playlist_id } if( playlist_id.is_a?(String) )
 
-        return { 'status' => 404, 'message' => 'no playlist found' } if( !data.is_a?(Array) || data.count.zero? || status.to_i != 200 )
-        return { 'status' => 404, 'message' => format('found %d playlists with name %s', data.count, playlist_id ) } if( data.count > 1 && multi_result == false )
+        return { "status" => 404, "message" => "no playlist found" } if( !data.is_a?(Array) || data.count.zero? || status.to_i != 200 )
+        return { "status" => 404, "message" => format("found %d playlists with name %s", data.count, playlist_id ) } if( data.count > 1 && multi_result == false )
 
       rescue
-        return { 'status' => 404, 'message' => 'no playlists found' } if( playlists.nil? || playlists == false || playlists.dig('status').to_i != 200 )
+        return { "status" => 404, "message" => "no playlists found" } if( playlists.nil? || playlists == false || playlists["status"].to_i != 200 )
       end
 
       if( multi_result == true )
 
-        result = { 'status' => 0, 'message' => 'under development' }
+        result = { "status" => 0, "message" => "under development" }
         data.each do |x|
 
-          endpoint = format( '/api/playlists/%d', x.dig('id') )
+          endpoint = format( "/api/playlists/%d", x["id"] )
 
           begin
             result = delete( endpoint )
-          rescue => error
-            logger.error( "error: #{error}" )
+          rescue => e
+            logger.error( "error: #{e}" )
           end
         end
 
         # return result
       else
 
-        playlist_id = data.first.dig('id')
+        playlist_id = data.first["id"]
 
-        endpoint = format( '/api/playlists/%d', playlist_id )
+        endpoint = format( "/api/playlists/%d", playlist_id )
 
         result = delete( endpoint )
 
-        if(result.dig('status').to_i == 500)
+        if(result["status"].to_i == 500)
           # check if the playlist exists
           r = playlist( playlist_id )
-          return { 'status' => 200, 'message' => 'playlist deleted' } if(r.dig('status').to_i == 404)
+          return { "status" => 200, "message" => "playlist deleted" } if(r["status"].to_i == 404)
         end
 
         # return result
@@ -539,50 +534,50 @@ module Grafana
       items.each do |r|
         playlist_element = {}
 
-        if( r['name'] )
+        if( r["name"] )
 
-          playlist_name = search_dashboards( query: r['name'] )
-          playlist_name_status = playlist_name.dig('status')
+          playlist_name = search_dashboards( query: r["name"] )
+          playlist_name_status = playlist_name["status"]
 
           next unless( playlist_name_status == 200 )
 
-          playlist_name       = playlist_name.dig('message')
-          playlist_name_id    = playlist_name.first.dig('id')
-          playlist_name_title = playlist_name.first.dig('title')
+          playlist_name       = playlist_name["message"]
+          playlist_name_id    = playlist_name.first["id"]
+          playlist_name_title = playlist_name.first["title"]
 
-          playlist_element[:type]  = 'dashboard_by_id'
+          playlist_element[:type]  = "dashboard_by_id"
           playlist_element[:value] = playlist_name_id.to_s
           playlist_element[:title] = playlist_name_title
           playlist_element[:playlistId] = playlist_id unless(playlist_id.nil?)
 
-        elsif( r['id'] )
+        elsif( r["id"] )
 
-          uid = dashboard_by_uid(r['id'])
-          uid_status = uid.dig('status')
+          uid = dashboard_by_uid(r["id"])
+          uid_status = uid["status"]
 
           next unless( uid_status == 200 )
 
-          playlist_element[:type]  = 'dashboard_by_id'
-          playlist_element[:value] = r['id']
+          playlist_element[:type]  = "dashboard_by_id"
+          playlist_element[:value] = r["id"]
           playlist_element[:playlistId] = playlist_id unless(playlist_id.nil?)
 
-        elsif( r['tag'] )
+        elsif( r["tag"] )
 
-          tags        = search_dashboards( tags: r['tag'] )
-          tags_status = tags.dig('status')
+          tags        = search_dashboards( tags: r["tag"] )
+          tags_status = tags["status"]
 
           next unless( tags_status == 200 )
 
-          playlist_element[:type]  = 'dashboard_by_tag'
-          playlist_element[:value] = r['tag']
-          playlist_element[:title] = r['tag']
+          playlist_element[:type]  = "dashboard_by_tag"
+          playlist_element[:value] = r["tag"]
+          playlist_element[:title] = r["tag"]
           playlist_element[:playlistId] = playlist_id unless(playlist_id.nil?)
 
         else
           next
         end
 
-        playlist_element[:order] = r['order'] if(r['order'])
+        playlist_element[:order] = r["order"] if(r["order"])
 
         playlist_items << playlist_element if(playlist_element.count >= 4)
       end

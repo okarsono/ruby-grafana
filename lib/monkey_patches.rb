@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 
 # -----------------------------------------------------------------------------
 # Monkey patches
@@ -70,8 +71,8 @@ end
 # -----------------------------------------------------------------------------
 
 class Time
-  def add_minutes(m)
-    self + (60 * m)
+  def add_minutes(minutes)
+    self + (60 * minutes)
   end
 end
 
@@ -87,6 +88,3 @@ true.is_a?(Boolean) #=> true
 false.is_a?(Boolean) #=> true
 
 # -----------------------------------------------------------------------------
-
-
-

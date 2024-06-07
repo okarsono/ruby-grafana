@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 
 module Grafana
 
@@ -39,8 +40,8 @@ module Grafana
     #
     def dashboard( name )
 
-      raise ArgumentError.new(format('wrong type. \'name\' must be an String, given \'%s\'', name.class.to_s)) unless( name.is_a?(String) )
-      raise ArgumentError.new('missing name') if( name.size.zero? )
+      raise ArgumentError.new(format("wrong type. 'name' must be an String, given '%s'", name.class.to_s)) unless( name.is_a?(String) )
+      raise ArgumentError.new("missing name") if( name.empty? )
 
 #       v, mv = version.values
 #
@@ -50,7 +51,7 @@ module Grafana
 #         puts 'This function works well with Grafana v4.x'
 #       end
 
-      endpoint = format( '/api/dashboards/db/%s', slug(name) )
+      endpoint = format( "/api/dashboards/db/%s", slug(name) )
       @logger.debug( "Attempting to get dashboard (GET #{endpoint})" ) if @debug
 
       get( endpoint )
@@ -72,17 +73,15 @@ module Grafana
     #
     def dashboard_by_uid( uid )
 
-      if( uid.is_a?(String) && uid.is_a?(Integer) )
-        raise ArgumentError.new(format('wrong type. dashboard \'uid\' must be an String (for an title name) or an Integer (for an Datasource Id), given \'%s\'', uid.class.to_s))
-      end
-      raise ArgumentError.new('missing \'uid\'') if( uid.size.zero? )
+      raise ArgumentError.new(format("wrong type. dashboard 'uid' must be an String (for an title name) or an Integer (for an Datasource Id), given '%s'", uid.class.to_s)) if  uid.is_a?(String) && uid.is_a?(Integer) 
+      raise ArgumentError.new("missing 'uid'") if( uid.empty? )
 
       v, mv = version.values
-      return { 'status' => 404, 'message' => format( 'uid has been supported in Grafana since version 5. you use version %s', v) } if(mv < 5)
+      return { "status" => 404, "message" => format( "uid has been supported in Grafana since version 5. you use version %s", v) } if(mv < 5)
 
-      return { 'status' => 404, 'message' => format( 'The uid can have a maximum length of 40 characters, but it is %s characters long', uid.length) } if( uid.length > 40 )
+      return { "status" => 404, "message" => format( "The uid can have a maximum length of 40 characters, but it is %s characters long", uid.length) } if( uid.length > 40 )
 
-      endpoint = format( '/api/dashboards/uid/%s', uid )
+      endpoint = format( "/api/dashboards/uid/%s", uid )
       @logger.debug( "Attempting to get dashboard (GET #{endpoint})" ) if @debug
 
       get( endpoint )
@@ -127,33 +126,33 @@ module Grafana
     # POST /api/dashboards/db
     def create_dashboard( params )
 
-      raise ArgumentError.new(format('wrong type. \'params\' must be an Hash, given \'%s\'', params.class.to_s)) unless( params.is_a?(Hash) )
-      raise ArgumentError.new('missing \'params\'') if( params.size.zero? )
+      raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
+      raise ArgumentError.new("missing 'params'") if( params.empty? )
 
-      dashboard = validate( params, required: true , var: 'dashboard', type: Hash )
-      overwrite = validate( params, required: false, var: 'overwrite', type: Boolean ) || true
-      folder_id = validate( params, required: false, var: 'folderId' )
-      message   = validate( params, required: false, var: 'message', type: String )
+      dashboard = validate( params, required: true , var: "dashboard", type: Hash )
+      overwrite = validate( params, required: false, var: "overwrite", type: Boolean ) || true
+      folder_id = validate( params, required: false, var: "folderId" )
+      message   = validate( params, required: false, var: "message", type: String )
 
       dashboard = regenerate_template_ids( dashboard )
 
       unless(folder_id.nil?)
         f_folder = folder(folder_id)
-        return { 'status' => 404, 'message' => format( 'No Folder \'%s\' found', folder_id) } if( f_folder.dig('status') != 200 )
+        return { "status" => 404, "message" => format( "No Folder '%s' found", folder_id) } if( f_folder["status"] != 200 )
 
-        folder_id = f_folder.dig('id')
+        folder_id = f_folder["id"]
       end
 
       db = JSON.parse( dashboard ) if( dashboard.is_a?(String) )
-      title = db.dig('dashboard','title')
-      uid   = db.dig('dashboard','uid')
+      title = db.dig("dashboard","title")
+      uid   = db.dig("dashboard","uid")
 
-      return { 'status' => 404, 'message' => format( 'The template \'%s\' can\'t be create. The uid can have a maximum length of 40 characters, but it is %s characters long', title, uid.length) } if( ! uid.nil? && uid.length > 40 )
+      return { "status" => 404, "message" => format( "The template '%s' can't be create. The uid can have a maximum length of 40 characters, but it is %s characters long", title, uid.length) } if( ! uid.nil? && uid.length > 40 )
 
-      endpoint = '/api/dashboards/db'
+      endpoint = "/api/dashboards/db"
 
       payload = {
-        dashboard: db.dig('dashboard'),
+        dashboard: db["dashboard"],
         overwrite: overwrite,
         folderId: folder_id,
         message: message
@@ -179,10 +178,10 @@ module Grafana
     #
     def delete_dashboard( name )
 
-      raise ArgumentError.new(format('wrong type. \'name\' must be an String, given \'%s\'', name.class.to_s)) unless( name.is_a?(String) )
-      raise ArgumentError.new('missing name') if( name.size.zero? )
+      raise ArgumentError.new(format("wrong type. 'name' must be an String, given '%s'", name.class.to_s)) unless( name.is_a?(String) )
+      raise ArgumentError.new("missing name") if( name.empty? )
 
-      endpoint = format( '/api/dashboards/db/%s', slug(name) )
+      endpoint = format( "/api/dashboards/db/%s", slug(name) )
 
       @logger.debug("Deleting dashboard #{slug(name)} (DELETE #{endpoint})") if @debug
 
@@ -198,7 +197,7 @@ module Grafana
     #
     def home_dashboard
 
-      endpoint = '/api/dashboards/home'
+      endpoint = "/api/dashboards/home"
 
       @logger.debug("Attempting to get home dashboard (GET #{endpoint})") if @debug
 
@@ -214,7 +213,7 @@ module Grafana
     #
     def dashboard_tags
 
-      endpoint = '/api/dashboards/tags'
+      endpoint = "/api/dashboards/tags"
 
       @logger.debug("Attempting to get dashboard tags(GET #{endpoint})") if @debug
 
@@ -234,24 +233,24 @@ module Grafana
     #
     def search_dashboards( params )
 
-      raise ArgumentError.new(format('wrong type. \'params\' must be an Hash, given \'%s\'', params.class.to_s)) unless( params.is_a?(Hash) )
+      raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
 
-      query   = validate( params, required: false, var: 'query', type: String )
-      starred = validate( params, required: false, var: 'starred', type: Boolean )
-      tags    = validate( params, required: false, var: 'tags' )
+      query   = validate( params, required: false, var: "query", type: String )
+      starred = validate( params, required: false, var: "starred", type: Boolean )
+      tags    = validate( params, required: false, var: "tags" )
 
       api     = []
-      api << format( 'query=%s', CGI.escape( query ) ) unless( query.nil? )
-      api << format( 'starred=%s', starred ? 'true' : 'false' ) unless( starred.nil? )
+      api << format( "query=%s", CGI.escape( query ) ) unless( query.nil? )
+      api << format( "starred=%s", starred ? "true" : "false" ) unless( starred.nil? )
 
       unless( tags.nil? )
-        tags = tags.join( '&tag=' ) if( tags.is_a?( Array ) )
-        api << format( 'tag=%s', tags )
+        tags = tags.join( "&tag=" ) if( tags.is_a?( Array ) )
+        api << format( "tag=%s", tags )
       end
 
-      api = api.join( '&' )
+      api = api.join( "&" )
 
-      endpoint = format( '/api/search/?%s' , api )
+      endpoint = format( "/api/search/?%s" , api )
 
       @logger.debug("Attempting to search for dashboards (GET #{endpoint})") if @debug
 
@@ -267,15 +266,15 @@ module Grafana
     #
     def import_dashboards_from_directory( directory )
 
-      raise ArgumentError.new('directory must be an String') unless( directory.is_a?(String) )
+      raise ArgumentError.new("directory must be an String") unless( directory.is_a?(String) )
 
       result = {}
 
-      dirs = Dir.glob( format( '%s/**.json', directory ) ).sort
+      dirs = Dir.glob( format( "%s/**.json", directory ) ).sort
 
       dirs.each do |f|
 
-        @logger.debug( format( 'import \'%s\'', f ) ) if @debug
+        @logger.debug( format( "import '%s'", f ) ) if @debug
 
         dashboard = File.read( f )
         dashboard = JSON.parse( dashboard )

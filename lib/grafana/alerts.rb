@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 
 module Grafana
 
@@ -28,13 +29,13 @@ module Grafana
     #
     def alerts( params )
 
-      raise ArgumentError.new(format('wrong type. \'params\' must be an Hash, given \'%s\'', params.class.to_s)) unless( params.is_a?(Hash) )
+      raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
 #       raise ArgumentError.new('missing \'params\'') if( params.size.zero? )
 
-      dashboard_id = validate( params, required: false, var: 'dashboard_id' )
-      panel_id     = validate( params, required: false, var: 'panel_id', type: Integer )
-      limit        = validate( params, required: false, var: 'limit', type: Integer )
-      alert_array  = validate( params, required: false, var: 'alerts', type: Array )
+      dashboard_id = validate( params, required: false, var: "dashboard_id" )
+      panel_id     = validate( params, required: false, var: "panel_id", type: Integer )
+      limit        = validate( params, required: false, var: "limit", type: Integer )
+      alert_array  = validate( params, required: false, var: "alerts", type: Array )
       valid_alerts = %w[ALL no_data paused alerting ok pending].sort
 
       unless( alert_array.nil? )
@@ -42,33 +43,33 @@ module Grafana
 #         valid   = alert_array & valid_alerts
         invalid = alert_array - valid_alerts
 
-        raise ArgumentError.new(format('wrong alerts type. only %s allowed, given \'%s\'', valid_alerts.join(', '), alert_array.join(', '))) if( invalid.count != 0 )
+        raise ArgumentError.new(format("wrong alerts type. only %s allowed, given '%s'", valid_alerts.join(", "), alert_array.join(", "))) if( invalid.count != 0 )
       end
 
       if( dashboard_id.is_a?(String) )
 
         dashboard = search_dashboards( query: dashboard_id )
 
-        return { 'status' => 404, 'message' => format( 'No Dashboard \'%s\' found', dashboard_id) } if( dashboard.nil? || dashboard.dig('status').to_i != 200 )
+        return { "status" => 404, "message" => format( "No Dashboard '%s' found", dashboard_id) } if( dashboard.nil? || dashboard["status"].to_i != 200 )
 
-        dashboard = dashboard.dig('message').first unless( dashboard.nil? && dashboard.dig('status').to_i == 200 )
-        dashboard_id = dashboard.dig('id') unless( dashboard.nil? )
+        dashboard = dashboard["message"].first unless( dashboard.nil? && dashboard["status"].to_i == 200 )
+        dashboard_id = dashboard["id"] unless( dashboard.nil? )
 
-        return { 'status' => 404, 'message' => format( 'No Dashboard \'%s\' found', dashboard_id) } if( dashboard_id.nil? )
+        return { "status" => 404, "message" => format( "No Dashboard '%s' found", dashboard_id) } if( dashboard_id.nil? )
       end
 
       api     = []
-      api << format( 'dashboardId=%s', dashboard_id ) unless( dashboard_id.nil? )
-      api << format( 'panelId=%s', panel_id ) unless( panel_id.nil? )
-      api << format( 'limit=%s', limit ) unless( limit.nil? )
+      api << format( "dashboardId=%s", dashboard_id ) unless( dashboard_id.nil? )
+      api << format( "panelId=%s", panel_id ) unless( panel_id.nil? )
+      api << format( "limit=%s", limit ) unless( limit.nil? )
 
       unless( alert_array.nil? )
-        alert_array = alert_array.join( '&state=' ) if( alert_array.is_a?( Array ) )
-        api << format( 'state=%s', alert_array )
+        alert_array = alert_array.join( "&state=" ) if( alert_array.is_a?( Array ) )
+        api << format( "state=%s", alert_array )
       end
-      api = api.join( '&' )
+      api = api.join( "&" )
 
-      endpoint = format( '/api/alerts/?%s' , api )
+      endpoint = format( "/api/alerts/?%s" , api )
 
       @logger.debug("Attempting to search for alerts (GET #{endpoint})") if @debug
 
@@ -89,10 +90,8 @@ module Grafana
     #
     def alert( alert_id )
 
-      if( alert_id.is_a?(String) && alert_id.is_a?(Integer) )
-        raise ArgumentError.new(format('wrong type. \'alert_id\' must be an String (for an Alert name) or an Integer (for an Alert Id), given \'%s\'', alert_id.class.to_s))
-      end
-      raise ArgumentError.new('missing \'alert_id\'') if( alert_id.size.zero? )
+      raise ArgumentError.new(format("wrong type. 'alert_id' must be an String (for an Alert name) or an Integer (for an Alert Id), given '%s'", alert_id.class.to_s)) if  alert_id.is_a?(String) && alert_id.is_a?(Integer) 
+      raise ArgumentError.new("missing 'alert_id'") if( alert_id.empty? )
 
 #       if(alert_id.is_a?(String))
 #         data = alerts( alerts: 'all' ).select { |_k,v| v['name'] == alert_id }
@@ -102,7 +101,7 @@ module Grafana
 #       puts alert_id
       # GET /api/alerts/:id
 
-      endpoint = format( '/api/alerts/%d' , alert_id )
+      endpoint = format( "/api/alerts/%d" , alert_id )
 
 #       puts endpoint
 
@@ -124,17 +123,15 @@ module Grafana
     #
     def alert_pause( alert_id )
 
-      if( alert_id.is_a?(String) && alert_id.is_a?(Integer) )
-        raise ArgumentError.new(format('wrong type. \'alert_id\' must be an String (for an Alert name) or an Integer (for an Alert Id), given \'%s\'', alert_id.class.to_s))
-      end
-      raise ArgumentError.new('missing \'alert_id\'') if( alert_id.size.zero? )
+      raise ArgumentError.new(format("wrong type. 'alert_id' must be an String (for an Alert name) or an Integer (for an Alert Id), given '%s'", alert_id.class.to_s)) if  alert_id.is_a?(String) && alert_id.is_a?(Integer) 
+      raise ArgumentError.new("missing 'alert_id'") if( alert_id.empty? )
 
       if( alert_id.is_a?(String) )
-        data = alerts( alerts: 'all' ).select { |_k,v| v['name'] == alert_id }
+        data = alerts( alerts: "all" ).select { |_k,v| v["name"] == alert_id }
         alert_id = data.keys.first if( data )
       end
 
-      endpoint = format( '/api/alerts/%d/pause', alert_id )
+      endpoint = format( "/api/alerts/%d/pause", alert_id )
 
       @logger.debug("Attempting pause alert id #{alert_id} (POST #{endpoint})") if @debug
 
@@ -151,8 +148,8 @@ module Grafana
     # @return [Hash]
     #
     def alert_notifications
-      logger.debug('Getting alert notifications') if @debug
-      get('/api/alert-notifications')
+      logger.debug("Getting alert notifications") if @debug
+      get("/api/alert-notifications")
     end
 
 
@@ -184,25 +181,25 @@ module Grafana
     #
     def create_alert_notification( params )
 
-      raise ArgumentError.new(format('wrong type. \'params\' must be an Hash, given \'%s\'', params.class.to_s)) unless( params.is_a?(Hash) )
-      raise ArgumentError.new('missing params') if( params.size.zero? )
+      raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
+      raise ArgumentError.new("missing params") if( params.empty? )
 
       # TODO
       # type are 'email'
       # and the other possible values?
-      name     = validate( params, required: true, var: 'name', type: String )
-      type     = validate( params, required: true, var: 'type', type: String ) || 'email'
-      default  = validate( params, required: false, var: 'default', type: Boolean ) || false
-      settings = validate( params, required: false, var: 'settings', type: Hash )
+      name     = validate( params, required: true, var: "name", type: String )
+      type     = validate( params, required: true, var: "type", type: String ) || "email"
+      default  = validate( params, required: false, var: "default", type: Boolean ) || false
+      settings = validate( params, required: false, var: "settings", type: Hash )
 
       unless( type.nil? )
         valid_types = %w[slack pagerduty email webhook kafka hipchat victorops sensu opsgenie threema pushover telegram line prometheus-alertmanager]
-        raise ArgumentError.new(format('wrong notification type. only %s allowed, given \%s\'', valid_types.join(', '), type)) if( valid_types.include?(type.downcase) == false )
+        raise ArgumentError.new(format('wrong notification type. only %s allowed, given \%s\'', valid_types.join(", "), type)) if( valid_types.include?(type.downcase) == false )
       end
 
       # TODO
       # check if the alert 'name' already created
-      return { 'status' => 404, 'message' => format( 'alert notification \'%s\' alread exists', name) } if( alert_notification?(name) )
+      return { "status" => 404, "message" => format( "alert notification '%s' alread exists", name) } if( alert_notification?(name) )
 
 #       data = alert_notifications
 #       data = data.dig('message').first unless( data.nil? && data.dig('status').to_i == 200 )
@@ -217,7 +214,7 @@ module Grafana
       }
       payload.reject!{ |_k, v| v.nil? }
 
-      endpoint = '/api/alert-notifications'
+      endpoint = "/api/alert-notifications"
 
 #       puts endpoint
 #       puts payload
@@ -261,29 +258,27 @@ module Grafana
     #
     def update_alert_notification( params )
 
-      raise ArgumentError.new(format('wrong type. \'params\' must be an Hash, given \'%s\'', params.class.to_s)) unless( params.is_a?(Hash) )
-      raise ArgumentError.new('missing params') if( params.size.zero? )
+      raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
+      raise ArgumentError.new("missing params") if( params.empty? )
 
       # TODO
       # type are 'email'
       # and the other possible values?
-      alert_id = validate( params, required: true, var: 'alert_id' )
-      name     = validate( params, required: true, var: 'name', type: String )
-      type     = validate( params, required: true, var: 'type', type: String ) || 'email'
-      default  = validate( params, required: false, var: 'default', type: Boolean ) || false
-      settings = validate( params, required: false, var: 'settings', type: Hash )
+      alert_id = validate( params, required: true, var: "alert_id" )
+      name     = validate( params, required: true, var: "name", type: String )
+      type     = validate( params, required: true, var: "type", type: String ) || "email"
+      default  = validate( params, required: false, var: "default", type: Boolean ) || false
+      settings = validate( params, required: false, var: "settings", type: Hash )
 
       unless( type.nil? )
         valid_types = %w[slack pagerduty email webhook kafka hipchat victorops sensu opsgenie threema pushover telegram line prometheus-alertmanager]
-        raise ArgumentError.new(format('wrong notification type. only %s allowed, given \%s\'', valid_types.join(', '), type)) if( valid_types.include?(type.downcase) == false )
+        raise ArgumentError.new(format('wrong notification type. only %s allowed, given \%s\'', valid_types.join(", "), type)) if( valid_types.include?(type.downcase) == false )
       end
 
-      if( alert_id.is_a?(String) && alert_id.is_a?(Integer) )
-        raise ArgumentError.new(format('wrong type. user \'alert_id\' must be an String (for an Alertname) or an Integer (for an Alert Id), given \'%s\'', alert_id.class.to_s))
-      end
+      raise ArgumentError.new(format("wrong type. user 'alert_id' must be an String (for an Alertname) or an Integer (for an Alert Id), given '%s'", alert_id.class.to_s)) if  alert_id.is_a?(String) && alert_id.is_a?(Integer) 
 
       alert_id = alert_notification_id(alert_id)
-      return { 'status' => 404, 'message' => format( 'alert notification \'%s\' not exists', name) } if( alert_id.nil? )
+      return { "status" => 404, "message" => format( "alert notification '%s' not exists", name) } if( alert_id.nil? )
 
       payload = {
         id: alert_id,
@@ -294,7 +289,7 @@ module Grafana
       }
       payload.reject!{ |_k, v| v.nil? }
 
-      endpoint = format( '/api/alert-notifications/%d', alert_id )
+      endpoint = format( "/api/alert-notifications/%d", alert_id )
 
       put(endpoint, payload.to_json)
     end
@@ -311,15 +306,13 @@ module Grafana
     #
     def delete_alert_notification( alert_id )
 
-      if( alert_id.is_a?(String) && alert_id.is_a?(Integer) )
-        raise ArgumentError.new(format('wrong type. user \'alert_id\' must be an String (for an Alert name) or an Integer (for an Alert Id), given \'%s\'', alert_id.class.to_s))
-      end
-      raise ArgumentError.new('missing \'alert_id\'') if( alert_id.size.zero? )
+      raise ArgumentError.new(format("wrong type. user 'alert_id' must be an String (for an Alert name) or an Integer (for an Alert Id), given '%s'", alert_id.class.to_s)) if  alert_id.is_a?(String) && alert_id.is_a?(Integer) 
+      raise ArgumentError.new("missing 'alert_id'") if( alert_id.empty? )
 
       id = alert_notification_id(alert_id)
-      return { 'status' => 404, 'message' => format( 'alert notification \'%s\' not exists', alert_id) } if( id.nil? )
+      return { "status" => 404, "message" => format( "alert notification '%s' not exists", alert_id) } if( id.nil? )
 
-      endpoint = format('/api/alert-notifications/%d', alert_id )
+      endpoint = format("/api/alert-notifications/%d", alert_id )
       logger.debug( "Deleting alert id #{alert_id} (DELETE #{endpoint})" ) if @debug
 
       delete( endpoint )
@@ -339,15 +332,15 @@ module Grafana
     def alert_notification_id( alert_id )
 
       data = alert_notifications
-      data = data.dig('message') unless( data.nil? && data.dig('status').to_i == 200 )
+      data = data["message"] unless( data.nil? && data["status"].to_i == 200 )
 
       map = {}
       data.each do |d|
-        map[d.dig('id')] = d.dig('name').downcase.split.join('_')
+        map[d["id"]] = d["name"].downcase.split.join("_")
       end
 
       id = map.select { |key,_value| key == alert_id } if( map && alert_id.is_a?(Integer) )
-      id = map.select { |_key,value| value == alert_id.downcase.split.join('_') } if( map && alert_id.is_a?(String) )
+      id = map.select { |_key,value| value == alert_id.downcase.split.join("_") } if( map && alert_id.is_a?(String) )
 
       id = id.keys.first unless(id.nil?)
 

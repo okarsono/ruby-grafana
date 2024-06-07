@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 
 module Grafana
 
@@ -36,34 +37,34 @@ module Grafana
     #
     def search_team( params )
 
-      raise ArgumentError.new(format('wrong type. \'params\' must be an Hash, given \'%s\'', params.class.to_s)) unless( params.is_a?(Hash) )
-      raise ArgumentError.new('missing \'params\'') if( params.size.zero? )
+      raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
+      raise ArgumentError.new("missing 'params'") if( params.empty? )
 
       v, mv = version.values
-      return { 'status' => 404, 'message' => format( 'team has been supported in Grafana since version 5. you use version %s', v) } if(mv < 5)
+      return { "status" => 404, "message" => format( "team has been supported in Grafana since version 5. you use version %s", v) } if(mv < 5)
 
-      perpage = validate( params, required: false, var: 'perpage', type: Integer ) || 1000
-      page    = validate( params, required: false, var: 'page'   , type: Integer ) || 1
-      query   = validate( params, required: false, var: 'query'  , type: String )
-      name    = validate( params, required: false, var: 'name'   , type: String )
+      perpage = validate( params, required: false, var: "perpage", type: Integer ) || 1000
+      page    = validate( params, required: false, var: "page"   , type: Integer ) || 1
+      query   = validate( params, required: false, var: "query"  , type: String )
+      name    = validate( params, required: false, var: "name"   , type: String )
 
       if(name.nil?)
         api     = []
-        api << format( 'perpage=%s', perpage ) unless( perpage.nil? )
-        api << format( 'page=%s', page ) unless( page.nil? )
-        api << format( 'query=%s', CGI.escape( query ) ) unless( query.nil? )
+        api << format( "perpage=%s", perpage ) unless( perpage.nil? )
+        api << format( "page=%s", page ) unless( page.nil? )
+        api << format( "query=%s", CGI.escape( query ) ) unless( query.nil? )
 
-        api = api.join( '&' )
+        api = api.join( "&" )
 
-        endpoint = format('/api/teams/search?%s', api)
+        endpoint = format("/api/teams/search?%s", api)
       else
-        endpoint = format('/api/teams/search?name=%s',CGI.escape(name))
+        endpoint = format("/api/teams/search?name=%s",CGI.escape(name))
       end
 
       @logger.debug("Attempting to search for alerts (GET #{endpoint})") if @debug
 
       r = get(endpoint)
-      r['status'] = 404 if( r.dig('totalCount').zero? )
+      r["status"] = 404 if( r["totalCount"].zero? )
       r
     end
 
@@ -75,27 +76,25 @@ module Grafana
     #
     def team( team_id )
 
-      if( team_id.is_a?(String) && team_id.is_a?(Integer) )
-        raise ArgumentError.new(format('wrong type. user \'team_id\' must be an String (for an Team name) or an Integer (for an Team Id), given \'%s\'', team_id.class.to_s))
-      end
-      raise ArgumentError.new('missing \'team_id\'') if( team_id.size.zero? )
+      raise ArgumentError.new(format("wrong type. user 'team_id' must be an String (for an Team name) or an Integer (for an Team Id), given '%s'", team_id.class.to_s)) if  team_id.is_a?(String) && team_id.is_a?(Integer) 
+      raise ArgumentError.new("missing 'team_id'") if( team_id.empty? )
 
       v, mv = version.values
-      return { 'status' => 404, 'message' => format( 'team has been supported in Grafana since version 5. you use version %s', v) } if(mv < 5)
+      return { "status" => 404, "message" => format( "team has been supported in Grafana since version 5. you use version %s", v) } if(mv < 5)
 
       if(team_id.is_a?(String))
         o_team = search_team(name: team_id)
-        status      = o_team.dig('status')
-        total_count = o_team.dig('totalCount')
+        status      = o_team["status"]
+        total_count = o_team["totalCount"]
 
-        return { 'status' => 404, 'message' => format( 'No Team \'%s\' found', team_id) } unless(status == 200 && total_count > 0)
+        return { "status" => 404, "message" => format( "No Team '%s' found", team_id) } unless(status == 200 && total_count.positive?)
 
-        teams = o_team.dig('teams')
-        team  = teams.detect { |x| x['name'] == team_id }
-        team_id = team.dig('id')
+        teams = o_team["teams"]
+        team  = teams.detect { |x| x["name"] == team_id }
+        team_id = team["id"]
       end
 
-      endpoint = format( '/api/teams/%s', team_id )
+      endpoint = format( "/api/teams/%s", team_id )
 
       @logger.debug("Getting team by Id #{team_id} (GET #{endpoint})") if @debug
       get(endpoint)
@@ -109,25 +108,25 @@ module Grafana
     #
     def add_team( params )
 
-      raise ArgumentError.new(format('wrong type. \'params\' must be an Hash, given \'%s\'', params.class.to_s)) unless( params.is_a?(Hash) )
-      raise ArgumentError.new('missing \'params\'') if( params.size.zero? )
+      raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
+      raise ArgumentError.new("missing 'params'") if( params.empty? )
 
       v, mv = version.values
-      return { 'status' => 404, 'message' => format( 'team has been supported in Grafana since version 5. you use version %s', v) } if(mv < 5)
+      return { "status" => 404, "message" => format( "team has been supported in Grafana since version 5. you use version %s", v) } if(mv < 5)
 
-      name  = validate( params, required: true, var: 'name'  , type: String )
-      email = validate( params, required: false, var: 'email', type: String )
+      name  = validate( params, required: true, var: "name"  , type: String )
+      email = validate( params, required: false, var: "email", type: String )
 
       o_team = search_team(name: name)
 
-      status      = o_team.dig('status')
-      total_count = o_team.dig('totalCount')
+      status      = o_team["status"]
+      total_count = o_team["totalCount"]
 #         teams = o_team.dig('teams')
 #         team  = teams.detect { |x| x['name'] == name }
 
-      return { 'status' => 404, 'message' => format('team \'%s\' alread exists', name) } if(status == 200 && total_count > 0)
+      return { "status" => 404, "message" => format("team '%s' alread exists", name) } if(status == 200 && total_count.positive?)
 
-      endpoint = '/api/teams'
+      endpoint = "/api/teams"
 
       payload = {
         name: name,
@@ -147,27 +146,27 @@ module Grafana
     #
     def update_team( params )
 
-      raise ArgumentError.new(format('wrong type. \'params\' must be an Hash, given \'%s\'', params.class.to_s)) unless( params.is_a?(Hash) )
-      raise ArgumentError.new('missing \'params\'') if( params.size.zero? )
+      raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
+      raise ArgumentError.new("missing 'params'") if( params.empty? )
 
       v, mv = version.values
-      return { 'status' => 404, 'message' => format( 'team has been supported in Grafana since version 5. you use version %s', v) } if(mv < 5)
+      return { "status" => 404, "message" => format( "team has been supported in Grafana since version 5. you use version %s", v) } if(mv < 5)
 
-      team_id = validate( params, required: true , var: 'team_id' )
-      name    = validate( params, required: false, var: 'name' , type: String )
-      email   = validate( params, required: true , var: 'email', type: String )
+      team_id = validate( params, required: true , var: "team_id" )
+      name    = validate( params, required: false, var: "name" , type: String )
+      email   = validate( params, required: true , var: "email", type: String )
 
       if(team_id.is_a?(String))
         o_team = search_team(name: team_id)
-        status      = o_team.dig('status')
-        total_count = o_team.dig('totalCount')
+        status      = o_team["status"]
+        total_count = o_team["totalCount"]
 
-        return { 'status' => 404, 'message' => format( 'No Team \'%s\' found', team_id) } unless(status == 200 && total_count > 0)
+        return { "status" => 404, "message" => format( "No Team '%s' found", team_id) } unless(status == 200 && total_count.positive?)
 
-        teams = o_team.dig('teams')
-        team  = teams.detect { |x| x['name'] == team_id }
+        teams = o_team["teams"]
+        team  = teams.detect { |x| x["name"] == team_id }
 
-        team_id = team.dig('id')
+        team_id = team["id"]
       end
 
       payload = {
@@ -176,7 +175,7 @@ module Grafana
       }
       payload.reject!{ |_, y| y.nil? }
 
-      endpoint = format( '/api/teams/%d', team_id )
+      endpoint = format( "/api/teams/%d", team_id )
       @logger.debug("Updating team with Id #{team_id} (PUT #{endpoint})") if @debug
 
       put( endpoint, payload.to_json )
@@ -193,29 +192,27 @@ module Grafana
     #
     def delete_team(team_id)
 
-      if( team_id.is_a?(String) && team_id.is_a?(Integer) )
-        raise ArgumentError.new(format('wrong type. user \'team_id\' must be an String (for an Team name) or an Integer (for an Team Id), given \'%s\'', team_id.class.to_s))
-      end
-      raise ArgumentError.new('missing \'team_id\'') if( team_id.size.zero? )
+      raise ArgumentError.new(format("wrong type. user 'team_id' must be an String (for an Team name) or an Integer (for an Team Id), given '%s'", team_id.class.to_s)) if  team_id.is_a?(String) && team_id.is_a?(Integer) 
+      raise ArgumentError.new("missing 'team_id'") if( team_id.empty? )
 
       v, mv = version.values
-      return { 'status' => 404, 'message' => format( 'team has been supported in Grafana since version 5. you use version %s', v) } if(mv < 5)
+      return { "status" => 404, "message" => format( "team has been supported in Grafana since version 5. you use version %s", v) } if(mv < 5)
 
       if(team_id.is_a?(String))
         o_team = search_team(name: team_id)
 
-        status      = o_team.dig('status')
-        total_count = o_team.dig('totalCount')
+        status      = o_team["status"]
+        total_count = o_team["totalCount"]
 
-        return { 'status' => 404, 'message' => format( 'No Team \'%s\' found', team_id) } unless(status == 200 && total_count > 0)
+        return { "status" => 404, "message" => format( "No Team '%s' found", team_id) } unless(status == 200 && total_count.positive?)
 
-        teams = o_team.dig('teams')
-        team  = teams.detect { |x| x['name'] == team_id }
+        teams = o_team["teams"]
+        team  = teams.detect { |x| x["name"] == team_id }
 
-        team_id = team.dig('id')
+        team_id = team["id"]
       end
 
-      endpoint = format( '/api/teams/%s', team_id )
+      endpoint = format( "/api/teams/%s", team_id )
 
       @logger.debug("delete team Id #{team_id} (GET #{endpoint})") if @debug
       delete(endpoint)
@@ -230,29 +227,27 @@ module Grafana
     #
     def team_members(team_id)
 
-      if( team_id.is_a?(String) && team_id.is_a?(Integer) )
-        raise ArgumentError.new(format('wrong type. user \'team_id\' must be an String (for an Team name) or an Integer (for an Team Id), given \'%s\'', team_id.class.to_s))
-      end
-      raise ArgumentError.new('missing \'team_id\'') if( team_id.size.zero? )
+      raise ArgumentError.new(format("wrong type. user 'team_id' must be an String (for an Team name) or an Integer (for an Team Id), given '%s'", team_id.class.to_s)) if  team_id.is_a?(String) && team_id.is_a?(Integer) 
+      raise ArgumentError.new("missing 'team_id'") if( team_id.empty? )
 
       v, mv = version.values
-      return { 'status' => 404, 'message' => format( 'team has been supported in Grafana since version 5. you use version %s', v) } if(mv < 5)
+      return { "status" => 404, "message" => format( "team has been supported in Grafana since version 5. you use version %s", v) } if(mv < 5)
 
       if(team_id.is_a?(String))
         o_team = search_team(name: team_id)
 
-        status      = o_team.dig('status')
-        total_count = o_team.dig('totalCount')
+        status      = o_team["status"]
+        total_count = o_team["totalCount"]
 
-        return { 'status' => 404, 'message' => format( 'No Team \'%s\' found', team_id) } unless(status == 200 && total_count > 0)
+        return { "status" => 404, "message" => format( "No Team '%s' found", team_id) } unless(status == 200 && total_count.positive?)
 
-        teams = o_team.dig('teams')
-        team  = teams.detect { |x| x['name'] == team_id }
+        teams = o_team["teams"]
+        team  = teams.detect { |x| x["name"] == team_id }
 
-        team_id = team.dig('id')
+        team_id = team["id"]
       end
 
-      endpoint = format( '/api/teams/%s/members', team_id )
+      endpoint = format( "/api/teams/%s/members", team_id )
 
       @logger.debug("Getting team by Id #{team_id} (GET #{endpoint})") if @debug
 
@@ -267,39 +262,37 @@ module Grafana
     #
     def add_team_member(params)
 
-      raise ArgumentError.new(format('wrong type. \'params\' must be an Hash, given \'%s\'', params.class.to_s)) unless( params.is_a?(Hash) )
-      raise ArgumentError.new('missing \'params\'') if( params.size.zero? )
+      raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
+      raise ArgumentError.new("missing 'params'") if( params.empty? )
 
       v, mv = version.values
-      return { 'status' => 404, 'message' => format( 'team has been supported in Grafana since version 5. you use version %s', v) } if(mv < 5)
+      return { "status" => 404, "message" => format( "team has been supported in Grafana since version 5. you use version %s", v) } if(mv < 5)
 
-      team_id = validate( params, required: true , var: 'team_id' )
-      user_id = validate( params, required: false, var: 'user_id' )
+      team_id = validate( params, required: true , var: "team_id" )
+      user_id = validate( params, required: false, var: "user_id" )
 
-      if( user_id.is_a?(String) && user_id.is_a?(Integer) )
-        raise ArgumentError.new(format('wrong type. user \'user_id\' must be an String (for an User name) or an Integer (for an User Id), given \'%s\'', user_id.class.to_s))
-      end
-      raise ArgumentError.new('missing \'user_id\'') if( user_id.size.zero? )
+      raise ArgumentError.new(format("wrong type. user 'user_id' must be an String (for an User name) or an Integer (for an User Id), given '%s'", user_id.class.to_s)) if  user_id.is_a?(String) && user_id.is_a?(Integer) 
+      raise ArgumentError.new("missing 'user_id'") if( user_id.empty? )
 
       if(team_id.is_a?(String))
         o_team = search_team(name: team_id)
-        status      = o_team.dig('status')
-        total_count = o_team.dig('totalCount')
+        status      = o_team["status"]
+        total_count = o_team["totalCount"]
 
-        return { 'status' => 404, 'message' => format( 'No Team \'%s\' found', team_id) } unless(status == 200 && total_count > 0)
+        return { "status" => 404, "message" => format( "No Team '%s' found", team_id) } unless(status == 200 && total_count.positive?)
 
-        teams = o_team.dig('teams')
-        team  = teams.detect { |x| x['name'] == team_id }
+        teams = o_team["teams"]
+        team  = teams.detect { |x| x["name"] == team_id }
 
-        team_id = team.dig('id')
+        team_id = team["id"]
       end
 
       if(user_id.is_a?(String))
         usr     = user(user_id)
-        status  = usr.dig('status')
-        user_id  = usr.dig('id')
+        status  = usr["status"]
+        user_id  = usr["id"]
 
-        return { 'status' => 404, 'message' => format( 'No User \'%s\' found', user_id) } unless(status == 200)
+        return { "status" => 404, "message" => format( "No User '%s' found", user_id) } unless(status == 200)
       end
 
       payload = {
@@ -307,7 +300,7 @@ module Grafana
       }
       payload.reject!{ |_, y| y.nil? }
 
-      endpoint = format( '/api/teams/%d/members', team_id )
+      endpoint = format( "/api/teams/%d/members", team_id )
 
       post( endpoint, payload.to_json )
     end
@@ -320,42 +313,40 @@ module Grafana
     #
     def remove_team_member(params)
 
-      raise ArgumentError.new(format('wrong type. \'params\' must be an Hash, given \'%s\'', params.class.to_s)) unless( params.is_a?(Hash) )
-      raise ArgumentError.new('missing \'params\'') if( params.size.zero? )
+      raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
+      raise ArgumentError.new("missing 'params'") if( params.empty? )
 
       v, mv = version.values
-      return { 'status' => 404, 'message' => format( 'team has been supported in Grafana since version 5. you use version %s', v) } if(mv < 5)
+      return { "status" => 404, "message" => format( "team has been supported in Grafana since version 5. you use version %s", v) } if(mv < 5)
 
-      team_id = validate( params, required: true , var: 'team_id' )
-      user_id = validate( params, required: false, var: 'user_id' )
+      team_id = validate( params, required: true , var: "team_id" )
+      user_id = validate( params, required: false, var: "user_id" )
 
-      if( user_id.is_a?(String) && user_id.is_a?(Integer) )
-        raise ArgumentError.new(format('wrong type. user \'user_id\' must be an String (for an User name) or an Integer (for an User Id), given \'%s\'', user_id.class.to_s))
-      end
-      raise ArgumentError.new('missing \'user_id\'') if( user_id.size.zero? )
+      raise ArgumentError.new(format("wrong type. user 'user_id' must be an String (for an User name) or an Integer (for an User Id), given '%s'", user_id.class.to_s)) if  user_id.is_a?(String) && user_id.is_a?(Integer) 
+      raise ArgumentError.new("missing 'user_id'") if( user_id.empty? )
 
       if(team_id.is_a?(String))
         o_team = search_team(name: team_id)
-        status      = o_team.dig('status')
-        total_count = o_team.dig('totalCount')
+        status      = o_team["status"]
+        total_count = o_team["totalCount"]
 
-        return { 'status' => 404, 'message' => format( 'No Team \'%s\' found', team_id) } unless(status == 200 && total_count > 0)
+        return { "status" => 404, "message" => format( "No Team '%s' found", team_id) } unless(status == 200 && total_count.positive?)
 
-        teams = o_team.dig('teams')
-        team  = teams.detect { |x| x['name'] == team_id }
+        teams = o_team["teams"]
+        team  = teams.detect { |x| x["name"] == team_id }
 
-        team_id = team.dig('id')
+        team_id = team["id"]
       end
 
       if(user_id.is_a?(String))
         usr     = user(user_id)
-        status  = usr.dig('status')
-        usr_id  = usr.dig('id')
+        status  = usr["status"]
+        usr_id  = usr["id"]
 
-        return { 'status' => 404, 'message' => format( 'No User \'%s\' found', user_id) } unless(status == 200)
+        return { "status" => 404, "message" => format( "No User '%s' found", user_id) } unless(status == 200)
       end
 
-      endpoint = format( '/api/teams/%d/members/%d', team_id, usr_id )
+      endpoint = format( "/api/teams/%d/members/%d", team_id, usr_id )
 
       delete(endpoint)
     end

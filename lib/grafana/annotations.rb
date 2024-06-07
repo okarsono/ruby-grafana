@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 
 module Grafana
 
@@ -38,44 +39,44 @@ module Grafana
     #
     def find_annotation( params )
 
-      raise ArgumentError.new(format('wrong type. \'params\' must be an Hash, given \'%s\'', params.class.to_s)) unless( params.is_a?(Hash) )
-      raise ArgumentError.new('missing \'params\'') if( params.size.zero? )
+      raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
+      raise ArgumentError.new("missing 'params'") if( params.empty? )
 
-      dashboard = validate( params, required: false, var: 'dashboard' )
-      from      = validate( params, required: false, var: 'from', type: Integer )
-      to        = validate( params, required: false, var: 'to', type: Integer )
-      limit     = validate( params, required: false, var: 'limit', type: Integer ) || 10
-      alert_id  = validate( params, required: false, var: 'alert_id', type: Integer )
-      panel_id  = validate( params, required: false, var: 'panel_id', type: Integer )
-      tags      = validate( params, required: false, var: 'tags', type: Array )
+      dashboard = validate( params, required: false, var: "dashboard" )
+      from      = validate( params, required: false, var: "from", type: Integer )
+      to        = validate( params, required: false, var: "to", type: Integer )
+      limit     = validate( params, required: false, var: "limit", type: Integer ) || 10
+      alert_id  = validate( params, required: false, var: "alert_id", type: Integer )
+      panel_id  = validate( params, required: false, var: "panel_id", type: Integer )
+      tags      = validate( params, required: false, var: "tags", type: Array )
 
       if( dashboard.is_a?(String) )
 
         dashboard = search_dashboards( query: dashboard )
 
-        return { 'status' => 404, 'message' => format( 'No Dashboard \'%s\' found', dashboard) } if( dashboard.nil? || dashboard.dig('status').to_i != 200 )
+        return { "status" => 404, "message" => format( "No Dashboard '%s' found", dashboard) } if( dashboard.nil? || dashboard["status"].to_i != 200 )
 
-        dashboard = dashboard.dig('message').first unless( dashboard.nil? && dashboard.dig('status').to_i == 200 )
-        dashboard = dashboard.dig('id') unless( dashboard.nil? )
+        dashboard = dashboard["message"].first unless( dashboard.nil? && dashboard["status"].to_i == 200 )
+        dashboard = dashboard["id"] unless( dashboard.nil? )
 
-        return { 'status' => 404, 'message' => format( 'No Dashboard \'%s\' found', dashboard) } if( dashboard.nil? )
+        return { "status" => 404, "message" => format( "No Dashboard '%s' found", dashboard) } if( dashboard.nil? )
       end
 
       api     = []
-      api << format( 'from=%s', from ) unless( from.nil? )
-      api << format( 'to=%s', to ) unless( to.nil? )
-      api << format( 'limit=%s', limit ) unless( limit.nil? )
-      api << format( 'alertId=%s', alert_id ) unless( alert_id.nil? )
-      api << format( 'panelId=%s', panel_id ) unless( panel_id.nil? )
-      api << format( 'dashboardId=%s', dashboard ) unless( dashboard.nil? )
+      api << format( "from=%s", from ) unless( from.nil? )
+      api << format( "to=%s", to ) unless( to.nil? )
+      api << format( "limit=%s", limit ) unless( limit.nil? )
+      api << format( "alertId=%s", alert_id ) unless( alert_id.nil? )
+      api << format( "panelId=%s", panel_id ) unless( panel_id.nil? )
+      api << format( "dashboardId=%s", dashboard ) unless( dashboard.nil? )
 
       unless( tags.nil? )
-        tags = tags.join( '&tags=' ) if( tags.is_a?( Array ) )
-        api << format( 'tags=%s', tags )
+        tags = tags.join( "&tags=" ) if( tags.is_a?( Array ) )
+        api << format( "tags=%s", tags )
       end
-      api = api.join( '&' )
+      api = api.join( "&" )
 
-      endpoint = format( '/api/annotations/?%s' , api )
+      endpoint = format( "/api/annotations/?%s" , api )
 
       @logger.debug("Attempting to search for annotations (GET #{endpoint})") if @debug
 
@@ -116,34 +117,32 @@ module Grafana
     #
     def create_annotation( params )
 
-      raise ArgumentError.new(format('wrong type. \'params\' must be an Hash, given \'%s\'', params.class.to_s)) unless( params.is_a?(Hash) )
-      raise ArgumentError.new('missing \'params\'') if( params.size.zero? )
+      raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
+      raise ArgumentError.new("missing 'params'") if( params.empty? )
 
-      dashboard = validate( params, required: false, var: 'dashboard' )
-      panel_id  = validate( params, required: false, var: 'panel_id', type: Integer )
-      time      = validate( params, required: false, var: 'time', type: Integer ) || Time.now.to_i
-      time_end  = validate( params, required: false, var: 'time_end', type: Integer )
-      region    = validate( params, required: false, var: 'region', type: Boolean )
-      tags      = validate( params, required: true , var: 'tags', type: Array )
-      text      = validate( params, required: true , var: 'text', type: String )
+      dashboard = validate( params, required: false, var: "dashboard" )
+      panel_id  = validate( params, required: false, var: "panel_id", type: Integer )
+      time      = validate( params, required: false, var: "time", type: Integer ) || Time.now.to_i
+      time_end  = validate( params, required: false, var: "time_end", type: Integer )
+      region    = validate( params, required: false, var: "region", type: Boolean )
+      tags      = validate( params, required: true , var: "tags", type: Array )
+      text      = validate( params, required: true , var: "text", type: String )
 
       if( dashboard.is_a?(String) )
 
         dashboard = search_dashboards( query: dashboard )
 
-        return { 'status' => 404, 'message' => format( 'No Dashboard \'%s\' found', dashboard) } if( dashboard.nil? || dashboard.dig('status').to_i != 200 )
+        return { "status" => 404, "message" => format( "No Dashboard '%s' found", dashboard) } if( dashboard.nil? || dashboard["status"].to_i != 200 )
 
-        dashboard = dashboard.dig('message').first unless( dashboard.nil? && dashboard.dig('status').to_i == 200 )
-        dashboard = dashboard.dig('id') unless( dashboard.nil? )
+        dashboard = dashboard["message"].first unless( dashboard.nil? && dashboard["status"].to_i == 200 )
+        dashboard = dashboard["id"] unless( dashboard.nil? )
 
-        return { 'status' => 404, 'message' => format( 'No Dashboard \'%s\' found', dashboard) } if( dashboard.nil? )
+        return { "status" => 404, "message" => format( "No Dashboard '%s' found", dashboard) } if( dashboard.nil? )
       end
 
-      unless( time_end.nil? )
-        return { 'status' => 404, 'message' => format( '\'end_time\' can\'t be lower then \'time\'' ) } if( time_end < time )
-      end
+      return { "status" => 404, "message" => format( "'end_time' can't be lower then 'time'" ) } if time_end && (time_end < time)
 
-      endpoint = '/api/annotations'
+      endpoint = "/api/annotations"
       payload = {
         dashboardId: dashboard,
         panelId: panel_id,
@@ -187,15 +186,15 @@ module Grafana
     #
     def create_annotation_graphite( params )
 
-      raise ArgumentError.new(format('wrong type. \'params\' must be an Hash, given \'%s\'', params.class.to_s)) unless( params.is_a?(Hash) )
-      raise ArgumentError.new('missing \'params\'') if( params.size.zero? )
+      raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
+      raise ArgumentError.new("missing 'params'") if( params.empty? )
 
-      what      = validate( params, required: true , var: 'what', type: String )
-      time_when = validate( params, required: false, var: 'when', type: Integer ) || Time.now.to_i
-      tags      = validate( params, required: true , var: 'tags', type: Array )
-      data      = validate( params, required: false, var: 'data', type: String )
+      what      = validate( params, required: true , var: "what", type: String )
+      time_when = validate( params, required: false, var: "when", type: Integer ) || Time.now.to_i
+      tags      = validate( params, required: true , var: "tags", type: Array )
+      data      = validate( params, required: false, var: "data", type: String )
 
-      endpoint = '/api/annotations/graphite'
+      endpoint = "/api/annotations/graphite"
       payload = {
         what: what,
         when: time_when,
@@ -231,21 +230,19 @@ module Grafana
     #
     def update_annotation( params )
 
-      raise ArgumentError.new(format('wrong type. \'params\' must be an Hash, given \'%s\'', params.class.to_s)) unless( params.is_a?(Hash) )
-      raise ArgumentError.new('missing \'params\'') if( params.size.zero? )
+      raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
+      raise ArgumentError.new("missing 'params'") if( params.empty? )
 
-      annotation_id = validate( params, required: true, var: 'annotation', type: Integer )
-      time      = validate( params, required: false, var: 'time', type: Integer )
-      time_end  = validate( params, required: false, var: 'time_end', type: Integer )
-      region    = validate( params, required: false, var: 'region', type: Boolean )
-      tags      = validate( params, required: false, var: 'tags', type: Array )
-      text      = validate( params, required: false, var: 'text', type: String )
+      annotation_id = validate( params, required: true, var: "annotation", type: Integer )
+      time      = validate( params, required: false, var: "time", type: Integer )
+      time_end  = validate( params, required: false, var: "time_end", type: Integer )
+      region    = validate( params, required: false, var: "region", type: Boolean )
+      tags      = validate( params, required: false, var: "tags", type: Array )
+      text      = validate( params, required: false, var: "text", type: String )
 
-      unless( time_end.nil? )
-        return { 'status' => 404, 'message' => format( '\'end_time\' can\'t be lower then \'time\'' ) } if( time_end < time )
-      end
+      return { "status" => 404, "message" => format( "'end_time' can't be lower then 'time'" ) } if time_end && (time_end < time)
 
-      endpoint = format( '/api/annotations/%d', annotation_id)
+      endpoint = format( "/api/annotations/%d", annotation_id)
       payload = {
         time: time,
         timeEnd: time_end,
@@ -274,11 +271,11 @@ module Grafana
     #
     def delete_annotation( annotation_id )
 
-      raise ArgumentError.new(format('wrong type. user \'annotation_id\' must be an Integer, given \'%s\'', annotation_id.class.to_s)) unless( annotation_id.is_a?(Integer) )
-      raise ArgumentError.new('missing \'annotation_id\'') if( annotation_id.size.zero? )
-      raise ArgumentError.new('\'annotation_id\' can not be 0') if( annotation_id.zero? )
+      raise ArgumentError.new(format("wrong type. user 'annotation_id' must be an Integer, given '%s'", annotation_id.class.to_s)) unless( annotation_id.is_a?(Integer) )
+      raise ArgumentError.new("missing 'annotation_id'") if( annotation_id.empty? )
+      raise ArgumentError.new("'annotation_id' can not be 0") if( annotation_id.zero? )
 
-      endpoint = format( '/api/annotation/%d', annotation_id )
+      endpoint = format( "/api/annotation/%d", annotation_id )
 
       delete(endpoint)
     end
@@ -301,11 +298,11 @@ module Grafana
     #
     def delete_annotation_by_region( region_id )
 
-      raise ArgumentError.new(format('wrong type. user \'region_id\' must be an Integer, given \'%s\'', region_id.class.to_s)) unless( region_id.is_a?(Integer) )
-      raise ArgumentError.new('missing \'region_id\'') if( region_id.size.zero? )
+      raise ArgumentError.new(format("wrong type. user 'region_id' must be an Integer, given '%s'", region_id.class.to_s)) unless( region_id.is_a?(Integer) )
+      raise ArgumentError.new("missing 'region_id'") if( region_id.empty? )
 #       raise ArgumentError.new('\'region_id\' can not be 0') if( region_id.zero? )
 
-      endpoint = format( '/api/annotation/region/%d', region_id )
+      endpoint = format( "/api/annotation/region/%d", region_id )
 
       delete(endpoint)
     end

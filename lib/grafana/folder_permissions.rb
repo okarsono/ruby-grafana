@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Grafana
 
   # http://docs.grafana.org/http_api/folder_permissions/#folder-permissions-api
@@ -23,14 +24,14 @@ module Grafana
     def folder_permissions( folder_id )
 
       v, mv = version.values
-      return { 'status' => 404, 'message' => format( 'folder has been supported in Grafana since version 5. you use version %s', v) } if(mv < 5)
+      return { "status" => 404, "message" => format( "folder has been supported in Grafana since version 5. you use version %s", v) } if(mv < 5)
 
       f = folder( folder_id )
 
-      status = f.dig('status')
+      status = f["status"]
       return f if( status != 200 )
 
-      endpoint = format('/api/folders/%s/permissions', f.dig('uid') )
+      endpoint = format("/api/folders/%s/permissions", f["uid"] )
 
       @logger.debug("Getting all folders (GET #{endpoint})") if @debug
       get(endpoint)
@@ -49,27 +50,27 @@ module Grafana
     #
     def update_folder_permissions( params )
 
-      raise ArgumentError.new(format('wrong type. \'params\' must be an Hash, given \'%s\'', params.class.to_s)) unless( params.is_a?(Hash) )
-      raise ArgumentError.new('missing \'params\'') if( params.size.zero? )
+      raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
+      raise ArgumentError.new("missing 'params'") if( params.empty? )
 
       v, mv = version.values
-      return { 'status' => 404, 'message' => format( 'folder has been supported in Grafana since version 5. you use version %s', v) } if(mv < 5)
+      return { "status" => 404, "message" => format( "folder has been supported in Grafana since version 5. you use version %s", v) } if(mv < 5)
 
-      folder      = validate( params, required: true, var: 'folder'     , type: String )
-      permissions = validate( params, required: true, var: 'permissions', type: Hash )
+      folder      = validate( params, required: true, var: "folder"     , type: String )
+      permissions = validate( params, required: true, var: "permissions", type: Hash )
 
-      return { 'status' => 404, 'message' => 'no permissions given' } if( permissions.size.zero? )
+      return { "status" => 404, "message" => "no permissions given" } if( permissions.empty? )
 
       f_folder = folder(folder)
-      return { 'status' => 404, 'message' => format( 'No Folder \'%s\' found', folder) } if( f_folder.dig('status') != 200 )
+      return { "status" => 404, "message" => format( "No Folder '%s' found", folder) } if( f_folder["status"] != 200 )
 
-      folder_uid = f_folder.dig('uid')
+      folder_uid = f_folder["uid"]
 
       valid_roles = %w[View Edit Admin]
 #       valid_keys  = %w[role permission teamId userId]
 
-      c_team = permissions.dig('team')
-      c_user = permissions.dig('user')
+      c_team = permissions["team"]
+      c_user = permissions["user"]
       team   = []
       user   = []
 
@@ -82,15 +83,15 @@ module Grafana
           r = validate_hash( v, valid_roles )
 
           f_team = team(k)
-          team_id = f_team.dig('id')
+          team_id = f_team["id"]
 
-          next unless(( f_team.dig('status') == 200) && !check_keys.include?(team_id) && r == true )
+          next unless(( f_team["status"] == 200) && !check_keys.include?(team_id) && r == true )
 
           check_keys << team_id
 
           role_id = valid_roles.index(v)
           role_id += 1
-          role_id += 1 if(v == 'Admin')
+          role_id += 1 if(v == "Admin")
 
           team << {
             teamId: team_id,
@@ -108,15 +109,15 @@ module Grafana
           r = validate_hash( v, valid_roles )
 
           f_user = user(k)
-          user_id = f_user.dig('id')
+          user_id = f_user["id"]
 
-          next unless(( f_user.dig('status') == 200) && !check_keys.include?(user_id) && r == true )
+          next unless(( f_user["status"] == 200) && !check_keys.include?(user_id) && r == true )
 
           check_keys << user_id
 
           role_id = valid_roles.index(v)
           role_id += 1
-          role_id += 1 if(v == 'Admin')
+          role_id += 1 if(v == "Admin")
 
           user << {
             userId: user_id,
@@ -130,7 +131,7 @@ module Grafana
       }
       payload.reject!{ |_, y| y.nil? }
 
-      endpoint = format( '/api/folders/%s/permissions', folder_uid )
+      endpoint = format( "/api/folders/%s/permissions", folder_uid )
 
       post(endpoint, payload.to_json)
     end

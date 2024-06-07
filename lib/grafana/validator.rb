@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 
 module Grafana
 
@@ -19,18 +20,18 @@ module Grafana
     # @return [Mixed]
     #
     def validate( params, options )
-      required = options.dig(:required) || false
-      var      = options.dig(:var)
-      type     = options.dig(:type)
+      required = options[:required] || false
+      var      = options[:var]
+      type     = options[:type]
 
       params   = params.deep_symbolize_keys
-      variable = params.dig(var.to_sym)
+      variable = params[var.to_sym]
 
-      raise ArgumentError.new(format('\'%s\' is required and missing!', var)) if(variable.nil? && required == true )
+      raise ArgumentError.new(format("'%s' is required and missing!", var)) if(variable.nil? && required == true )
 
       unless( type.nil? )
         clazz = Object.const_get(type.to_s)
-        raise ArgumentError.new(format('wrong type. \'%s\' must be an %s, given \'%s\'', var, type, variable.class.to_s)) unless( variable.nil? || variable.is_a?(clazz) )
+        raise ArgumentError.new(format("wrong type. '%s' must be an %s, given '%s'", var, type, variable.class.to_s)) unless( variable.nil? || variable.is_a?(clazz) )
       end
 
       variable
@@ -45,11 +46,11 @@ module Grafana
 
 #       puts "validate_hash( #{value}, #{valid_params} )"
 
-      unless( valid_params.collect { |r| r.downcase }.include?(value.downcase) )
+      unless( valid_params.collect(&:downcase).include?(value.downcase) )
 #         puts "NOOO : #{value}"
         return {
-          'status' => 404,
-          'message' => format( 'wrong value. \'%s\' must be one of \'%s\'', value, valid_params.join('\', \''))
+          "status" => 404,
+          "message" => format( "wrong value. '%s' must be one of '%s'", value, valid_params.join("', '"))
         }
       end
 #      puts "result: #{result} #{result.class}"

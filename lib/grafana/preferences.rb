@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Grafana
 
   #
@@ -14,9 +15,9 @@ module Grafana
     def user_preferences
 
       v, mv = version.values
-      return { 'status' => 404, 'message' => format( 'folder has been supported in Grafana since version 5. you use version %s', v) } if(mv < 5)
+      return { "status" => 404, "message" => format( "folder has been supported in Grafana since version 5. you use version %s", v) } if(mv < 5)
 
-      endpoint = '/api/user/preferences'
+      endpoint = "/api/user/preferences"
       @logger.debug("Getting current user preferences (GET #{endpoint})") if @debug
       get(endpoint)
     end
@@ -31,10 +32,10 @@ module Grafana
     #
     def update_user_preferences(params)
 
-      raise ArgumentError.new(format('wrong type. \'params\' must be an Hash, given \'%s\'', params.class.to_s)) unless( params.is_a?(Hash) )
-      raise ArgumentError.new('missing \'params\'') if( params.size.zero? )
+      raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
+      raise ArgumentError.new("missing 'params'") if( params.empty? )
 
-      endpoint = '/api/user/preferences'
+      endpoint = "/api/user/preferences"
       @logger.debug("update current user preferences (GET #{endpoint})") if @debug
 
       update_preferences( endpoint, params )
@@ -46,9 +47,9 @@ module Grafana
     def org_preferences
 
       v, mv = version.values
-      return { 'status' => 404, 'message' => format( 'folder has been supported in Grafana since version 5. you use version %s', v) } if(mv < 5)
+      return { "status" => 404, "message" => format( "folder has been supported in Grafana since version 5. you use version %s", v) } if(mv < 5)
 
-      endpoint = '/api/org/preferences'
+      endpoint = "/api/org/preferences"
       @logger.debug("Getting current organisation preferences (GET #{endpoint})") if @debug
       get(endpoint)
     end
@@ -64,10 +65,10 @@ module Grafana
     #
     def update_org_preferences(params)
 
-      raise ArgumentError.new(format('wrong type. \'params\' must be an Hash, given \'%s\'', params.class.to_s)) unless( params.is_a?(Hash) )
-      raise ArgumentError.new('missing \'params\'') if( params.size.zero? )
+      raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
+      raise ArgumentError.new("missing 'params'") if( params.empty? )
 
-      endpoint = '/api/org/preferences'
+      endpoint = "/api/org/preferences"
       @logger.debug("update current organisation preferences (GET #{endpoint})") if @debug
 
       update_preferences( endpoint, params )
@@ -77,15 +78,15 @@ module Grafana
     private
     def update_preferences( endpoint, params )
 
-      theme          = validate( params, required: false, var: 'theme'         , type: String )
-      timezone       = validate( params, required: false, var: 'timezone'      , type: String )
-      home_dashboard = validate( params, required: false, var: 'home_dashboard')
+      theme          = validate( params, required: false, var: "theme"         , type: String )
+      timezone       = validate( params, required: false, var: "timezone"      , type: String )
+      home_dashboard = validate( params, required: false, var: "home_dashboard")
 
       valid_theme    = %w[light dark]
       valid_timezone = %w[utc browser]
 
       v, mv = version.values
-      return { 'status' => 404, 'message' => format( 'folder has been supported in Grafana since version 5. you use version %s', v) } if(mv < 5)
+      return { "status" => 404, "message" => format( "folder has been supported in Grafana since version 5. you use version %s", v) } if(mv < 5)
 
       unless(theme.nil?)
         v_theme = validate_hash( theme, valid_theme )
@@ -99,10 +100,10 @@ module Grafana
 
       unless(home_dashboard.nil?)
         v_dashboard = dashboard(home_dashboard)
-        return { 'status' => 404, 'message' => format('dashboard \'%s\' not found',home_dashboard) }\
-            unless(v_dashboard.dig('status') == 200)
+        return { "status" => 404, "message" => format("dashboard '%s' not found",home_dashboard) }\
+            unless(v_dashboard["status"] == 200)
 
-        dashboard_id = v_dashboard.dig('dashboard','id')
+        dashboard_id = v_dashboard.dig("dashboard","id")
       end
 
       payload = {

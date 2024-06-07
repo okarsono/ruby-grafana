@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 
 module Grafana
 
@@ -13,7 +14,7 @@ module Grafana
     # @return [Hash]
     #
     def users
-      endpoint = '/api/users'
+      endpoint = "/api/users"
       @logger.debug("Getting all users (GET #{endpoint})") if @debug
       get(endpoint)
     end
@@ -30,32 +31,30 @@ module Grafana
     #
     def user( user_id )
 
-      if( user_id.is_a?(String) && user_id.is_a?(Integer) )
-        raise ArgumentError.new(format('wrong type. user \'user_id\' must be an String (for an User name) or an Integer (for an User Id), given \'%s\'', user_id.class.to_s))
-      end
-      raise ArgumentError.new('missing \'user_id\'') if( user_id.size.zero? )
+      raise ArgumentError.new(format("wrong type. user 'user_id' must be an String (for an User name) or an Integer (for an User Id), given '%s'", user_id.class.to_s)) if  user_id.is_a?(String) && user_id.is_a?(Integer) 
+      raise ArgumentError.new("missing 'user_id'") if( user_id.empty? )
 
       if(user_id.is_a?(String))
         usrs  = users
         usrs  = JSON.parse(usrs) if(usrs.is_a?(String))
 
-        status = usrs.dig('status')
+        status = usrs["status"]
         return usrs if( status != 200 )
 
-        u = usrs.dig('message').detect { |v| v['login'] == user_id || v['email'] == user_id || v['name'] == user_id }
+        u = usrs["message"].detect { |v| v["login"] == user_id || v["email"] == user_id || v["name"] == user_id }
 
-        return { 'status' => 404, 'message' => format( 'No User \'%s\' found', user_id) } if( u.nil? )
+        return { "status" => 404, "message" => format( "No User '%s' found", user_id) } if( u.nil? )
 
-        user_id = u.dig('id') unless(u.nil?)
+        user_id = u["id"] unless(u.nil?)
       end
 
-      return { 'status' => 404, 'message' => format( 'No User \'%s\' found', user_id) } if( user_id.nil? )
+      return { "status" => 404, "message" => format( "No User '%s' found", user_id) } if( user_id.nil? )
 
-      endpoint = format( '/api/users/%s', user_id )
+      endpoint = format( "/api/users/%s", user_id )
 
       @logger.debug("Getting user by Id #{user_id} (GET #{endpoint})") if @debug
       data = get(endpoint)
-      data['id'] = user_id
+      data["id"] = user_id
       data
     end
 
@@ -69,15 +68,15 @@ module Grafana
     #
     def search_for_users_by( params )
 
-      raise ArgumentError.new(format('wrong type. \'params\' must be an Hash, given \'%s\'', params.class.to_s)) unless( params.is_a?(Hash) )
-      raise ArgumentError.new('missing \'params\'') if( params.size.zero? )
+      raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
+      raise ArgumentError.new("missing 'params'") if( params.empty? )
 
       all_users = users
       key, value = params.first
 
       logger.debug("Searching for users matching '#{key}' = '#{value}'") if @debug
       users = []
-      all_users.dig('message').each do |u|
+      all_users["message"].each do |u|
         users.push(u) if u.select { |_k,v| v == value }.count >= 1
       end
 
@@ -106,20 +105,20 @@ module Grafana
     # PUT /api/users/:id
     def update_user( params )
 
-      raise ArgumentError.new(format('wrong type. \'params\' must be an Hash, given \'%s\'', params.class.to_s)) unless( params.is_a?(Hash) )
+      raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
 
-      user_name  = validate( params, required: true , var: 'user_name' , type: String )
-      email      = validate( params, required: true , var: 'email'     , type: String )
-      login_name = validate( params, required: false, var: 'login_name', type: String ) || user_name
-      theme      = validate( params, required: false, var: 'theme'     , type: String )
+      user_name  = validate( params, required: true , var: "user_name" , type: String )
+      email      = validate( params, required: true , var: "email"     , type: String )
+      login_name = validate( params, required: false, var: "login_name", type: String ) || user_name
+      theme      = validate( params, required: false, var: "theme"     , type: String )
 
       usr = user(user_name)
 
-      return { 'status' => 404, 'message' => format('User \'%s\' not found', user_name) } if( usr.nil? || usr.dig('status').to_i != 200 )
+      return { "status" => 404, "message" => format("User '%s' not found", user_name) } if( usr.nil? || usr["status"].to_i != 200 )
 
-      user_id = usr.dig('id')
+      user_id = usr["id"]
 
-      endpoint = format( '/api/users/%d', user_id )
+      endpoint = format( "/api/users/%d", user_id )
       payload = {
         email: email,
         name: user_name,
@@ -150,18 +149,16 @@ module Grafana
     #
     def user_organizations( user_id )
 
-      if( user_id.is_a?(String) && user_id.is_a?(Integer) )
-        raise ArgumentError.new(format('wrong type. user \'user_id\' must be an String (for an Username) or an Integer (for an Userid), given \'%s\'', user_id.class.to_s))
-      end
-      raise ArgumentError.new('missing \'user_id\'') if( user_id.size.zero? )
+      raise ArgumentError.new(format("wrong type. user 'user_id' must be an String (for an Username) or an Integer (for an Userid), given '%s'", user_id.class.to_s)) if  user_id.is_a?(String) && user_id.is_a?(Integer) 
+      raise ArgumentError.new("missing 'user_id'") if( user_id.empty? )
 
       usr = user(user_id)
 
-      return { 'status' => 404, 'message' => format('User \'%s\' not found', user_id) } if( usr.nil? || usr.dig('status').to_i != 200 )
+      return { "status" => 404, "message" => format("User '%s' not found", user_id) } if( usr.nil? || usr["status"].to_i != 200 )
 
-      user_id = usr.dig('id')
+      user_id = usr["id"]
 
-      endpoint = format('/api/users/%d/orgs', user_id )
+      endpoint = format("/api/users/%d/orgs", user_id )
       @logger.debug("Getting organizations for User #{user_id} (GET #{endpoint})") if @debug
       get(endpoint)
     end

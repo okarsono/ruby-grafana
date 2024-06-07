@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 
 module Grafana
 
@@ -20,7 +21,7 @@ module Grafana
     # GET /api/auth/keys
     def api_keys
 
-      endpoint = '/api/auth/keys'
+      endpoint = "/api/auth/keys"
 
       @logger.debug("Attempting to get all existing api keys (GET #{endpoint})") if @debug
 
@@ -30,10 +31,8 @@ module Grafana
 
     def api_key( api_id )
 
-      if( api_id.is_a?(String) && api_id.is_a?(Integer) )
-        raise ArgumentError.new(format('wrong type. API token \'api_id\' must be an String (for an API name) or an Integer (for an API Id), given \'%s\'', api_id.class.to_s))
-      end
-      raise ArgumentError.new('missing \'api_id\'') if( api_id.size.zero? )
+      raise ArgumentError.new(format("wrong type. API token 'api_id' must be an String (for an API name) or an Integer (for an API Id), given '%s'", api_id.class.to_s)) if  api_id.is_a?(String) && api_id.is_a?(Integer) 
+      raise ArgumentError.new("missing 'api_id'") if( api_id.empty? )
 
       if(api_id.is_a?(String))
         keys  = api_keys
@@ -41,19 +40,19 @@ module Grafana
 
 #         logger.debug(keys)
 
-        status = keys.dig('status')
+        status = keys["status"]
         return keys if( status != 200 )
 
-        u = keys.dig('message').detect { |v| v['id'] == api_id || v['name'] == api_id }
+        u = keys["message"].detect { |v| v["id"] == api_id || v["name"] == api_id }
 
 #         logger.debug(u)
 
-        return { 'status' => 404, 'message' => format( 'No API token \'%s\' found', api_id ) } if( u.nil? )
+        return { "status" => 404, "message" => format( "No API token '%s' found", api_id ) } if( u.nil? )
 
         # api_id = u.dig('id') unless(u.nil?)
       end
 
-      { 'status' => 200, 'message' => u }
+      { "status" => 200, "message" => u }
 
     end
 
@@ -77,12 +76,12 @@ module Grafana
     #
     def create_api_key( params )
 
-      raise ArgumentError.new(format('wrong type. \'params\' must be an Hash, given \'%s\'', params.class.to_s)) unless( params.is_a?(Hash) )
-      raise ArgumentError.new('missing \'params\'') if( params.size.zero? )
+      raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
+      raise ArgumentError.new("missing 'params'") if( params.empty? )
 
-      name            = validate( params, required: true, var: 'name' )
-      role            = validate( params, required: true, var: 'role' )
-      seconds_to_live = validate( params, required: false, var: 'seconds_to_live', type: Integer )
+      name            = validate( params, required: true, var: "name" )
+      role            = validate( params, required: true, var: "role" )
+      seconds_to_live = validate( params, required: false, var: "seconds_to_live", type: Integer )
 
       valid_roles     = %w[Viewer Editor Admin]
 
@@ -91,16 +90,16 @@ module Grafana
       downcased = Set.new valid_roles.map(&:downcase)
       unless( downcased.include?( role.downcase ) )
         return {
-          'status' => 404,
-          'login_or_email' => login_or_email,
-          'role' => role,
-          'message' => format( 'wrong role. Role must be one of %s, given \'%s\'', valid_roles.join(', '), role )
+          "status" => 404,
+          "login_or_email" => login_or_email,
+          "role" => role,
+          "message" => format( "wrong role. Role must be one of %s, given '%s'", valid_roles.join(", "), role )
         }
       end
 
       seconds_to_live = 86_400 if seconds_to_live.nil?
 
-      endpoint = '/api/auth/keys'
+      endpoint = "/api/auth/keys"
 
       data = {
         name: name,
@@ -124,21 +123,19 @@ module Grafana
     # DELETE /api/auth/keys/:id
     def delete_api_key( key_id )
 
-      if( key_id.is_a?(String) && key_id.is_a?(Integer) )
-        raise ArgumentError.new(format('wrong type. \'key_id\' must be an String (for an API Key name) or an Integer (for an API Key Id), given \'%s\'', key_id.class.to_s))
-      end
-      raise ArgumentError.new('missing \'key_id\'') if( key_id.size.zero? )
+      raise ArgumentError.new(format("wrong type. 'key_id' must be an String (for an API Key name) or an Integer (for an API Key Id), given '%s'", key_id.class.to_s)) if  key_id.is_a?(String) && key_id.is_a?(Integer) 
+      raise ArgumentError.new("missing 'key_id'") if( key_id.empty? )
 
       if(key_id.is_a?(String))
-        data = api_keys.select { |_k,v| v['name'] == key_id }
+        data = api_keys.select { |_k,v| v["name"] == key_id }
         key_id = data.keys.first if( data )
       end
 
-      return { 'status' => 404, 'message' => format( 'No API key \'%s\' found', key_id) } if( key_id.nil? )
+      return { "status" => 404, "message" => format( "No API key '%s' found", key_id) } if( key_id.nil? )
 
-      raise format('API Key can not be 0') if( key_id.zero? )
+      raise format("API Key can not be 0") if( key_id.zero? )
 
-      endpoint = format('/api/auth/keys/%d', key_id)
+      endpoint = format("/api/auth/keys/%d", key_id)
       logger.debug("Deleting API key #{key_id} (DELETE #{endpoint})") if @debug
 
       delete(endpoint)

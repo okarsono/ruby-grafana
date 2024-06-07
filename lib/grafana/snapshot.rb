@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 
 module Grafana
 
@@ -9,9 +10,9 @@ module Grafana
     # GET /api/snapshots/:key
     def snapshot(key)
 
-      raise ArgumentError.new('key must be an String') unless( key.is_a?(String) )
+      raise ArgumentError.new("key must be an String") unless( key.is_a?(String) )
 
-      endpoint = format('/api/snapshots/%s', key)
+      endpoint = format("/api/snapshots/%s", key)
       @logger.debug("Get Snapshot by Id #{key} (GET #{endpoint})") if @debug
 
       get(endpoint)
@@ -21,9 +22,9 @@ module Grafana
     # POST /api/snapshots
     def create_snapshot( dashboard = {} )
 
-      raise ArgumentError.new('dashboard must be an Hash') unless( dashboard.is_a?(String) )
+      raise ArgumentError.new("dashboard must be an Hash") unless( dashboard.is_a?(String) )
 
-      endpoint = '/api/snapshots'
+      endpoint = "/api/snapshots"
       @logger.debug("Creating dashboard snapshot (POST #{endpoint})") if @debug
 
       post(endpoint, dashboard)
@@ -34,9 +35,9 @@ module Grafana
     # GET /api/snapshots-delete/:key
     def delete_snapshot(key)
 
-      raise ArgumentError.new('key must be an String') unless( key.is_a?(String) )
+      raise ArgumentError.new("key must be an String") unless( key.is_a?(String) )
 
-      endpoint = format( '/api/snapshots-delete/%s', key)
+      endpoint = format( "/api/snapshots-delete/%s", key)
       @logger.debug("Deleting snapshot id #{key} (GET #{endpoint})") if @debug
 
       delete(endpoint)

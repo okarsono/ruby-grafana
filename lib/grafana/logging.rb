@@ -1,5 +1,6 @@
+# frozen_string_literal: true
 
-require 'logger'
+require "logger"
 
 # -------------------------------------------------------------------------------------------------
 
@@ -18,22 +19,22 @@ module Logging
       @loggers[classname] ||= configure_logger_for( classname )
     end
 
-    def configure_logger_for( classname )
+    def configure_logger_for( _classname )
 
-      log_level = ENV.fetch('LOG_LEVEL', 'INFO' )
+      log_level = ENV.fetch("LOG_LEVEL", "INFO" )
       level = log_level.dup
 
       # DEBUG < INFO < WARN < ERROR < FATAL < UNKNOWN
       log_level = case level.upcase
-        when 'DEBUG'
+        when "DEBUG"
           Logger::DEBUG   # Low-level information for developers.
-        when 'INFO'
+        when "INFO"
           Logger::INFO    # Generic (useful) information about system operation.
-        when 'WARN'
+        when "WARN"
           Logger::WARN    # A warning.
-        when 'ERROR'
+        when "ERROR"
           Logger::ERROR   # A handleable error condition.
-        when 'FATAL'
+        when "FATAL"
           Logger::FATAL   # An unhandleable error that results in a program crash.
         else
           Logger::UNKNOWN  # An unknown message that should always be logged.
@@ -43,7 +44,7 @@ module Logging
       logger                 = Logger.new($stdout)
       logger.level           = log_level
       logger.datetime_format = "%Y-%m-%d %H:%M:%S %z"
-      logger.formatter       = proc do |severity, datetime, progname, msg|
+      logger.formatter       = proc do |severity, datetime, _progname, msg|
         "[#{datetime.strftime( logger.datetime_format )}] #{severity.ljust(5)}  #{msg}\n"
       end
 

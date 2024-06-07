@@ -49,6 +49,16 @@ PerceivedComplexity:
 Style/Encoding:
   Enabled: false
 
+Style/FormatStringToken:
+  EnforcedStyle: unannotated
+
+Style/OptionalBooleanParameter:
+  AllowedMethods: [playlist_items, delete_playlist]
+
+Style/StringLiterals:
+  Enabled: true
+  EnforcedStyle: double_quotes
+
 Style/RaiseArgs:
   EnforcedStyle: compact
 
@@ -57,4 +67,3 @@ Layout:
 
 Style/RescueStandardError:
   Enabled: False
-

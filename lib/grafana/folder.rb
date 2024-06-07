@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Grafana
 
   # http://docs.grafana.org/http_api/folder/#folder-api
@@ -16,9 +17,9 @@ module Grafana
     def folders
 
       v, mv = version.values
-      return { 'status' => 404, 'message' => format( 'folder has been supported in Grafana since version 5. you use version %s', v) } if(mv < 5)
+      return { "status" => 404, "message" => format( "folder has been supported in Grafana since version 5. you use version %s", v) } if(mv < 5)
 
-      endpoint = '/api/folders'
+      endpoint = "/api/folders"
       @logger.debug("Getting all folders (GET #{endpoint})") if @debug
       get(endpoint)
     end
@@ -34,35 +35,35 @@ module Grafana
     # Will return the folder identified by id.
     def folder( folder_uid )
 
-      raise ArgumentError.new(format('wrong type. user \'folder_uid\' must be an String (for an Folder Uid) or an Integer (for an Folder Id), given \'%s\'', folder_uid.class.to_s)) \
+      raise ArgumentError.new(format("wrong type. user 'folder_uid' must be an String (for an Folder Uid) or an Integer (for an Folder Id), given '%s'", folder_uid.class.to_s)) \
           if( folder_uid.is_a?(String) && folder_uid.is_a?(Integer) )
-      raise ArgumentError.new('missing \'folder_uid\'') if( folder_uid.size.zero? )
+      raise ArgumentError.new("missing 'folder_uid'") if( folder_uid.empty? )
 
       v, mv = version.values
-      return { 'status' => 404, 'message' => format( 'folder has been supported in Grafana since version 5. you use version %s', v) } if(mv < 5)
+      return { "status" => 404, "message" => format( "folder has been supported in Grafana since version 5. you use version %s", v) } if(mv < 5)
 
       if(folder_uid.is_a?(Integer))
 
         f  = folders
         f  = JSON.parse(f) if(f.is_a?(String))
 
-        status = f.dig('status')
+        status = f["status"]
         return f if( status != 200 )
 
-        f = f.dig('message').detect {|x| x['id'] == folder_uid }
+        f = f["message"].detect {|x| x["id"] == folder_uid }
 
-        return { 'status' => 404, 'message' => format( 'No Folder \'%s\' found', folder_uid) } if( folder_uid.nil? )
+        return { "status" => 404, "message" => format( "No Folder '%s' found", folder_uid) } if( folder_uid.nil? )
 
-        folder_uid = f.dig('uid') unless(f.nil?)
+        folder_uid = f["uid"] unless(f.nil?)
 
-        return { 'status' => 404, 'message' => format( 'No Folder \'%s\' found', folder_uid) } if( folder_uid.is_a?(Integer) )
+        return { "status" => 404, "message" => format( "No Folder '%s' found", folder_uid) } if( folder_uid.is_a?(Integer) )
       end
 
-      return { 'status' => 404, 'message' => format( 'The uid can have a maximum length of 40 characters, but it is %s characters long', folder_uid.length) } \
+      return { "status" => 404, "message" => format( "The uid can have a maximum length of 40 characters, but it is %s characters long", folder_uid.length) } \
           if( folder_uid.is_a?(String) && folder_uid.length > 40 )
-      return { 'status' => 404, 'message' => format( 'No Folder \'%s\' found', folder_uid) } if( folder_uid.nil? )
+      return { "status" => 404, "message" => format( "No Folder '%s' found", folder_uid) } if( folder_uid.nil? )
 
-      endpoint = format( '/api/folders/%s', folder_uid )
+      endpoint = format( "/api/folders/%s", folder_uid )
 
       @logger.debug("Getting folder by Id #{folder_uid} (GET #{endpoint})") if @debug
       get(endpoint)
@@ -78,16 +79,16 @@ module Grafana
     #   title - The title of the folder.
     def create_folder( params )
 
-      raise ArgumentError.new(format('wrong type. \'params\' must be an Hash, given \'%s\'', params.class.to_s)) unless( params.is_a?(Hash) )
-      raise ArgumentError.new('missing \'params\'') if( params.size.zero? )
+      raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
+      raise ArgumentError.new("missing 'params'") if( params.empty? )
 
       v, mv = version.values
-      return { 'status' => 404, 'message' => format( 'folder has been supported in Grafana since version 5. you use version %s', v) } if(mv < 5)
+      return { "status" => 404, "message" => format( "folder has been supported in Grafana since version 5. you use version %s", v) } if(mv < 5)
 
-      title = validate( params, required: false, var: 'title', type: String )
-      uid   = validate( params, required: true , var: 'uid'  , type: String )
+      title = validate( params, required: false, var: "title", type: String )
+      uid   = validate( params, required: true , var: "uid"  , type: String )
 
-      return { 'status' => 404, 'message' => format( 'The uid can have a maximum length of 40 characters. \'%s\' given', uid.length) } if( uid.length > 40 )
+      return { "status" => 404, "message" => format( "The uid can have a maximum length of 40 characters. '%s' given", uid.length) } if( uid.length > 40 )
 
       data = {
         uid: uid,
@@ -97,7 +98,7 @@ module Grafana
 
       payload = data.deep_string_keys
 
-      endpoint = '/api/folders'
+      endpoint = "/api/folders"
 
       @logger.debug("create folder #{title} (GET #{endpoint})") if  @debug
       logger.debug(payload.to_json) if(@debug)
@@ -120,24 +121,24 @@ module Grafana
     #   - overwrite - Set to true if you want to overwrite existing folder with newer version.
     def update_folder( params )
 
-      raise ArgumentError.new(format('wrong type. \'params\' must be an Hash, given \'%s\'', params.class.to_s)) unless( params.is_a?(Hash) )
-      raise ArgumentError.new('missing \'params\'') if( params.size.zero? )
+      raise ArgumentError.new(format("wrong type. 'params' must be an Hash, given '%s'", params.class.to_s)) unless( params.is_a?(Hash) )
+      raise ArgumentError.new("missing 'params'") if( params.empty? )
 
       v, mv = version.values
-      return { 'status' => 404, 'message' => format( 'folder has been supported in Grafana since version 5. you use version %s', v) } if(mv < 5)
+      return { "status" => 404, "message" => format( "folder has been supported in Grafana since version 5. you use version %s", v) } if(mv < 5)
 
-      uid       = validate( params, required: true , var: 'uid'      , type: String )
-      title     = validate( params, required: true , var: 'title'    , type: String )
-      new_uid   = validate( params, required: false, var: 'new_uid'  , type: String )
-      version   = validate( params, required: false, var: 'version'  , type: Integer )
-      overwrite = validate( params, required: false, var: 'overwrite', type: Boolean ) || false
+      uid       = validate( params, required: true , var: "uid"      , type: String )
+      title     = validate( params, required: true , var: "title"    , type: String )
+      new_uid   = validate( params, required: false, var: "new_uid"  , type: String )
+      version   = validate( params, required: false, var: "version"  , type: Integer )
+      overwrite = validate( params, required: false, var: "overwrite", type: Boolean ) || false
 
       existing_folder = folder( uid )
-      return { 'status' => 404, 'message' => format( 'No Folder \'%s\' found', uid) } if( existing_folder.dig('status') != 200 )
+      return { "status" => 404, "message" => format( "No Folder '%s' found", uid) } if( existing_folder["status"] != 200 )
 
       unless( new_uid.nil? )
         existing_folder = folder( new_uid )
-        return { 'status' => 404, 'message' => format( 'Folder \'%s\' found', uid) } if( existing_folder.dig('status') == 200 )
+        return { "status" => 404, "message" => format( "Folder '%s' found", uid) } if( existing_folder["status"] == 200 )
       end
 
       payload = {
@@ -150,7 +151,7 @@ module Grafana
 
       @logger.debug("Updating folder with Uid #{uid}") if @debug
 
-      endpoint = format( '/api/folders/%s', uid )
+      endpoint = format( "/api/folders/%s", uid )
 
       put( endpoint, payload.to_json )
     end
@@ -163,30 +164,30 @@ module Grafana
     # This operation cannot be reverted.
     def delete_folder( folder_uid )
 
-      raise ArgumentError.new(format('wrong type. user \'folder_uid\' must be an String (for an Folder Uid) or an Integer (for an Folder Id), given \'%s\'', folder_uid.class.to_s)) \
+      raise ArgumentError.new(format("wrong type. user 'folder_uid' must be an String (for an Folder Uid) or an Integer (for an Folder Id), given '%s'", folder_uid.class.to_s)) \
           if( folder_uid.is_a?(String) && folder_uid.is_a?(Integer) )
-      raise ArgumentError.new('missing \'folder_uid\'') if( folder_uid.size.zero? )
+      raise ArgumentError.new("missing 'folder_uid'") if( folder_uid.empty? )
 
       v, mv = version.values
-      return { 'status' => 404, 'message' => format( 'folder has been supported in Grafana since version 5. you use version %s', v) } if(mv < 5)
+      return { "status" => 404, "message" => format( "folder has been supported in Grafana since version 5. you use version %s", v) } if(mv < 5)
 
       if(folder_uid.is_a?(Integer))
 
         fldrs  = folders
 
         fldrs  = JSON.parse(fldrs) if(fldrs.is_a?(String))
-        status = fldrs.dig('status')
+        status = fldrs["status"]
 
         return fldrs if( status != 200 )
 
-        fldrs.dig('message').each do |d|
-          folder_uid = d.dig('uid').to_s
+        fldrs["message"].each do |d|
+          folder_uid = d["uid"].to_s
         end
       end
 
-      return { 'status' => 404, 'message' => format( 'No User \'%s\' found', folder_uid) } if( folder_uid.nil? )
+      return { "status" => 404, "message" => format( "No User '%s' found", folder_uid) } if( folder_uid.nil? )
 
-      endpoint = format( '/api/folders/%s', folder_uid )
+      endpoint = format( "/api/folders/%s", folder_uid )
 
       @logger.debug("deleting folder by uid #{folder_uid} (GET #{endpoint})") if @debug
       delete(endpoint)
